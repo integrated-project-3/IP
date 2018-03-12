@@ -11,6 +11,7 @@
                   @row-clicked="rowClicked"
                   @sort-changed="sortChanged"
                   @row-dblclicked="openTimeline"
+                  :busy.sync="isBusy"
                   >
         </b-table>
       </b-col>
@@ -25,37 +26,9 @@
 import SelectionHandler from './SelectionHandler.vue'
 import axios from 'axios'
 
-// for (var i = 0; i < timelines.length; i++) {
-//   timelines[i].selected: false
-//   timelines[i]._rowVariant: ''
-// }
-
-// var timelines = [
-//   { title: "Timeline 15", date: "27/03/2018", selected: false, _rowVariant: ''},
-//   { title: "Timeline 6", date: "18/03/2018", selected: false, _rowVariant: ''},
-//   { title: "Timeline 13", date: "25/03/2018", selected: false, _rowVariant: ''},
-//   { title: "Timeline 14", date: "26/03/2018", selected: false, _rowVariant: ''},
-//   { title: "Timeline 2", date: "14/03/2018", selected: false, _rowVariant: ''},
-//   { title: "Timeline 1", date: "13/03/2018", selected: false, _rowVariant: ''},
-//   { title: "Timeline 12", date: "24/03/2018", selected: false, _rowVariant: ''},
-//   { title: "Timeline 20", date: "01/04/2018", selected: false, _rowVariant: ''},
-//   { title: "Timeline 7", date: "19/03/2018", selected: false, _rowVariant: ''},
-//   { title: "Timeline 8", date: "20/03/2018", selected: false, _rowVariant: ''},
-//   { title: "Timeline 11", date: "23/03/2018", selected: false, _rowVariant: ''},
-//   { title: "Timeline 10", date: "22/03/2018", selected: false, _rowVariant: ''},
-//   { title: "Timeline 18", date: "30/03/2018", selected: false, _rowVariant: ''},
-//   { title: "Timeline 5", date: "17/03/2018", selected: false, _rowVariant: ''},
-//   { title: "Timeline 9", date: "21/03/2018", selected: false, _rowVariant: ''},
-//   { title: "Timeline 17", date: "29/03/2018", selected: false, _rowVariant: ''},
-//   { title: "Timeline 16", date: "28/03/2018", selected: false, _rowVariant: ''},
-//   { title: "Timeline 19", date: "31/03/2018", selected: false, _rowVariant: ''},
-//   { title: "Timeline 3", date: "15/03/2018", selected: false, _rowVariant: ''},
-//   { title: "Timeline 4", date: "16/03/2018", selected: false, _rowVariant: ''}
-// ]
-
 var fields = [
-  { key: 'Title', sortable: true},
-  { key: 'CreationTimeStamp', sortable: true, label: 'Date', formatter: 'dateFormatter' }
+  { key: 'title', sortable: true},
+  { key: 'date', sortable: true, formatter: 'dateFormatter' }
 ]
 var sort = {
   by: 'date',
@@ -64,6 +37,7 @@ var sort = {
 var selectCount = 0
 
 function clearSelected(t) {
+  console.log(t)
   for (var i = 0; i < timelines.length; i++) {
     var timeline = timelines[i]
     timeline.selected = false
@@ -116,7 +90,8 @@ export default {
       fields,
       sort,
       selectCount,
-      clearSelected
+      clearSelected,
+      isBusy: false
     }
   },
   methods: {
@@ -165,19 +140,14 @@ export default {
       this.$router.push({name: 'TIMELINE', params: {timeline: item}} )
     },
     getTimelines: function(ctx) {
-      let promise = axios.get('https://gcu.ideagen-development.com/Timeline/GetTimelines', {
+      let promise = axios.get('https://b0qss3eydk.execute-api.eu-west-2.amazonaws.com/prod/timelines', {
         headers: {
-          AuthToken: '7cbc5c61-bcfa-47d8-a171-599616102147',
-          TenantId: 'Team19'
+          'X-Api-Key': 'zQfYRHZ1vY3GFnvDZep8Z5KqlHsOKxgf1vnldchF'
         }
       })
-
       return promise.then((data) => {
         return data.data
       }).catch(error => {
-        // Here we could override the busy state, setting isBusy to false
-        // this.isBusy = false
-        // Returning an empty array, allows table to correctly handle busy state in case of error
         return []
       })
     },
