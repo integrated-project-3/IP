@@ -1,15 +1,27 @@
 <template >
   <b-row class="timeline" align-v="center">
     <b-col>
-      <h3>Hello</h3>
-      <router-link to="/">Back</router-link>
+      <b-btn @click="back">Back</b-btn>
+    </b-col>
+    <b-col>
+      <h3>{{title}}</h3>
     </b-col>
   </b-row>
 </template>
 
 <script>
 export default {
-  name: 'Timeline'
+  name: 'Timeline',
+  data() {
+    return {
+      title: this.$route.params.timeline.title
+    }
+  },
+  methods: {
+    back: function() {
+      this.$router.push({name: 'REGISTER'})
+    }
+  }
 }
 </script>
 

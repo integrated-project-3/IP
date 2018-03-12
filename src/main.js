@@ -9,21 +9,14 @@ Vue.use(VueRouter)
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
-// set up aws
-// import {getTimelines} from './scripts/aws-get'
-//
-// var t = getTimelines()
-//
-// console.log(t)
-
 // set up routes
 
 import Register from './components/Register.vue'
 import Timeline from './components/Timeline.vue'
 
 const routes = [
-  { path: '/', component: Register},
-  { path: '/timeline', component: Timeline}
+  { name: 'REGISTER', path: '/', component: Register},
+  { name: 'TIMELINE', path: '/timeline', component: Timeline}
 ]
 
 const router = new VueRouter({

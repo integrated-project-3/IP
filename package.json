@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "aws-sdk": "^2.206.0",
+    "axios": "^0.18.0",
     "bootstrap-vue": "^2.0.0-rc.2",
     "vue": "^2.5.13",
     "vue-router": "^3.0.1"

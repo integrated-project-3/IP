@@ -3,13 +3,14 @@
     <b-row class="register" align-v="center">
       <b-col></b-col>
       <b-col md="11">
-        <b-table :items="timelines"
+        <b-table :items="getTimelines"
                   bordered:false
                   :sort-by.sync="sort.by"
                   :sort-desc.sync="sort.desc"
                   :fields="fields"
                   @row-clicked="rowClicked"
                   @sort-changed="sortChanged"
+                  @row-dblclicked="openTimeline"
                   >
         </b-table>
       </b-col>
@@ -22,39 +23,45 @@
 <script>
 
 import SelectionHandler from './SelectionHandler.vue'
+import axios from 'axios'
 
-var timelines = [
-  { title: "Timeline 15", date: "27/03/2018", selected: false, _rowVariant: ''},
-  { title: "Timeline 6", date: "18/03/2018", selected: false, _rowVariant: ''},
-  { title: "Timeline 13", date: "25/03/2018", selected: false, _rowVariant: ''},
-  { title: "Timeline 14", date: "26/03/2018", selected: false, _rowVariant: ''},
-  { title: "Timeline 2", date: "14/03/2018", selected: false, _rowVariant: ''},
-  { title: "Timeline 1", date: "13/03/2018", selected: false, _rowVariant: ''},
-  { title: "Timeline 12", date: "24/03/2018", selected: false, _rowVariant: ''},
-  { title: "Timeline 20", date: "01/04/2018", selected: false, _rowVariant: ''},
-  { title: "Timeline 7", date: "19/03/2018", selected: false, _rowVariant: ''},
-  { title: "Timeline 8", date: "20/03/2018", selected: false, _rowVariant: ''},
-  { title: "Timeline 11", date: "23/03/2018", selected: false, _rowVariant: ''},
-  { title: "Timeline 10", date: "22/03/2018", selected: false, _rowVariant: ''},
-  { title: "Timeline 18", date: "30/03/2018", selected: false, _rowVariant: ''},
-  { title: "Timeline 5", date: "17/03/2018", selected: false, _rowVariant: ''},
-  { title: "Timeline 9", date: "21/03/2018", selected: false, _rowVariant: ''},
-  { title: "Timeline 17", date: "29/03/2018", selected: false, _rowVariant: ''},
-  { title: "Timeline 16", date: "28/03/2018", selected: false, _rowVariant: ''},
-  { title: "Timeline 19", date: "31/03/2018", selected: false, _rowVariant: ''},
-  { title: "Timeline 3", date: "15/03/2018", selected: false, _rowVariant: ''},
-  { title: "Timeline 4", date: "16/03/2018", selected: false, _rowVariant: ''}
-]
+// for (var i = 0; i < timelines.length; i++) {
+//   timelines[i].selected: false
+//   timelines[i]._rowVariant: ''
+// }
+
+// var timelines = [
+//   { title: "Timeline 15", date: "27/03/2018", selected: false, _rowVariant: ''},
+//   { title: "Timeline 6", date: "18/03/2018", selected: false, _rowVariant: ''},
+//   { title: "Timeline 13", date: "25/03/2018", selected: false, _rowVariant: ''},
+//   { title: "Timeline 14", date: "26/03/2018", selected: false, _rowVariant: ''},
+//   { title: "Timeline 2", date: "14/03/2018", selected: false, _rowVariant: ''},
+//   { title: "Timeline 1", date: "13/03/2018", selected: false, _rowVariant: ''},
+//   { title: "Timeline 12", date: "24/03/2018", selected: false, _rowVariant: ''},
+//   { title: "Timeline 20", date: "01/04/2018", selected: false, _rowVariant: ''},
+//   { title: "Timeline 7", date: "19/03/2018", selected: false, _rowVariant: ''},
+//   { title: "Timeline 8", date: "20/03/2018", selected: false, _rowVariant: ''},
+//   { title: "Timeline 11", date: "23/03/2018", selected: false, _rowVariant: ''},
+//   { title: "Timeline 10", date: "22/03/2018", selected: false, _rowVariant: ''},
+//   { title: "Timeline 18", date: "30/03/2018", selected: false, _rowVariant: ''},
+//   { title: "Timeline 5", date: "17/03/2018", selected: false, _rowVariant: ''},
+//   { title: "Timeline 9", date: "21/03/2018", selected: false, _rowVariant: ''},
+//   { title: "Timeline 17", date: "29/03/2018", selected: false, _rowVariant: ''},
+//   { title: "Timeline 16", date: "28/03/2018", selected: false, _rowVariant: ''},
+//   { title: "Timeline 19", date: "31/03/2018", selected: false, _rowVariant: ''},
+//   { title: "Timeline 3", date: "15/03/2018", selected: false, _rowVariant: ''},
+//   { title: "Timeline 4", date: "16/03/2018", selected: false, _rowVariant: ''}
+// ]
+
 var fields = [
-  { key: 'title', sortable: true},
-  { key: 'date', sortable: true}
+  { key: 'Title', sortable: true},
+  { key: 'CreationTimeStamp', sortable: true, label: 'Date', formatter: 'dateFormatter' }
 ]
 var sort = {
   by: 'date',
   desc: false
 }
 var selectCount = 0
-var lastSelected = []
 
 function clearSelected(t) {
   for (var i = 0; i < timelines.length; i++) {
@@ -63,23 +70,19 @@ function clearSelected(t) {
     timeline._rowVariant = ''
   }
   t.selectCount = 0
-  //lastSelected = {}
 }
 function selectRow(item, t) {
   item.selected = true,
   item._rowVariant = 'select'
   t.selectCount++
-  //lastSelected.push(item)
 }
 function deselectRow(item, t) {
   item.selected = false,
   item._rowVariant = ''
   t.selectCount--
-  //lastSelected.pop()
 }
-function selectBetweenRows(lastIndex, newIndex, t) {
-  console.log(lastIndex)
-  console.log(newIndex)
+function selectBetweenRows(newIndex, t) {
+  console.log(newIndex, t)
 }
 function deleteSelected(t) {
   var sure = confirm("Delete?")
@@ -110,7 +113,6 @@ export default {
   },
   data() {
     return {
-      timelines,
       fields,
       sort,
       selectCount,
@@ -135,8 +137,7 @@ export default {
       if (item.selected) {
         if (event.ctrlKey) {
           deselectRow(item, this)
-        } else if (event.shiftKey) {
-        } else {
+        } else if (!event.shiftKey) {
           if (this.selectCount > 1) {
             clearSelected(this)
             selectRow(item, this)
@@ -150,7 +151,7 @@ export default {
         } else if (event.shiftKey) {
           selectRow(item, this)
           if (this.selectCount > 1) {
-            selectBetweenRows(lastSelected[lastSelected.length-2], item, this)
+            selectBetweenRows(index, this)
           }
         } else {
           if (this.selectCount > 0) {
@@ -159,8 +160,34 @@ export default {
           selectRow(item, this)
         }
       }
-    }
+    },
+    openTimeline: function(item) {
+      this.$router.push({name: 'TIMELINE', params: {timeline: item}} )
+    },
+    getTimelines: function(ctx) {
+      let promise = axios.get('https://gcu.ideagen-development.com/Timeline/GetTimelines', {
+        headers: {
+          AuthToken: '7cbc5c61-bcfa-47d8-a171-599616102147',
+          TenantId: 'Team19'
+        }
+      })
 
+      return promise.then((data) => {
+        return data.data
+      }).catch(error => {
+        // Here we could override the busy state, setting isBusy to false
+        // this.isBusy = false
+        // Returning an empty array, allows table to correctly handle busy state in case of error
+        return []
+      })
+    },
+    dateFormatter: function(ticks) {
+      const epochTicks = 621355968000000000;
+      var ticksSinceEpoch = ticks - epochTicks;
+      var millisecondsSinceEpoch = ticksSinceEpoch / 10000;
+      var date = new Date(millisecondsSinceEpoch);
+      return date.toLocaleDateString()
+    }
   }
 }
 </script>

@@ -24,7 +24,7 @@ export default {
   font-family: 'Gill Sans MT';
 }
 
-body {
+body, #app {
   background-color: $background;
 }
 </style>
