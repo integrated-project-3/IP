@@ -1,12 +1,15 @@
 <template>
-  <b-row class="header" align-v="start" align-h="start">
-    <b-col class="logo" sm="5">
-      <img src="../assets/logo.png" />
+  <b-row class="header" align-v="start">
+    <b-col class="logo" md="6">
+      <router-link to="/">
+        <img src="../assets/images/logo.png" alt="Aileron Airways" />
+      </router-link>
     </b-col>
-    <b-col class="search" sm="7">
+    <b-col class="search" align-self="center">
       <span>
-        <i v-on:click="search" class="material-icons">search</i>
-        <b-form-input v-model="searchValue" placeholder="Search..."></b-form-input>
+        <i v-on:click="search" class="material-icons icon">search</i>
+        <input type="text" v-model="searchValue" placeholder="Search..." />
+        <i class="material-icons arrow-down">arrow_drop_down</i>
       </span>
     </b-col>
   </b-row>
@@ -23,7 +26,6 @@ export default {
   },
   methods: {
     search: function() {
-      alert(this.searchValue)
     }
   }
 }
@@ -35,13 +37,44 @@ export default {
 
 .header {
   background-color: $header-bg;
+  color: $text;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+  padding-bottom: 15px;
+  .logo {
+    padding: 35px 30px 15px 30px;
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+  }
+  .search {
+    i {
+      cursor: pointer;
+      position: absolute;
+    }
+    .icon {
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 3em;
+    }
+    input {
+      background-color: $search-bg;
+      border-radius: 2px;
+      border-width: 0;
+      width: 100%;
+      font-size: 3em;
+      padding-left: 65px;
+      &:focus {
+        outline: none;
+      }
+    }
+    .arrow-down {
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 5em;
+      right: 10px;
+    }
+  }
 }
 
-.header .logo {
-  padding: 35px 0 15px 30px;
-}
-
-.header .search {
-
-}
 </style>
