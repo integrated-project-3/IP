@@ -1,39 +1,39 @@
-import Vue from 'vue'
+import Vue from 'vue/dist/vue.js'
 import App from './App.vue'
 import BootstrapVue from 'bootstrap-vue'
+import VueRouter from 'vue-router'
 
 Vue.use(BootstrapVue)
+Vue.use(VueRouter)
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
-Vue.config.productionTip = false
+// set up aws
+// import {getTimelines} from './scripts/aws-get'
+//
+// var t = getTimelines()
+//
+// console.log(t)
 
-// var aws = require('aws-sdk/dist/aws-sdk-react-native');
-// const region = 'eu-west-2'
-// aws.config.update({region: region})
-// aws.config.credentials = new aws.CognitoIdentityCredentials({IdentityPoolId: 'eu-west-2:08d581de-ebd5-4b08-9a05-a19aadcca3bc'});
-// var lambda = new aws.Lambda({region: region, apiVersion: '2015-03-31'})
-//
-// var pullParams = {
-//   FunctionName: 'Aileron-GetTimelines',
-//   InvocationType: 'RequestResponse',
-//   LogType: 'None'
-// }
-//
-// lambda.invoke(pullParams, function(error, data) {
-//   var results = ''
-//
-//   if (error) {
-//     console.log(error)
-//   } else {
-//     results = JSON.parse(data.Payload)
-//   }
-//
-//   console.log(results)
-//
-// })
+// set up routes
+
+import Register from './components/Register.vue'
+import Timeline from './components/Timeline.vue'
+
+const routes = [
+  { path: '/', component: Register},
+  { path: '/timeline', component: Timeline}
+]
+
+const router = new VueRouter({
+  routes
+})
+
+// try and fail to turn off productionTip
+Vue.config.productionTip = false;
 
 new Vue({
-  render: h => h(App)
+  render: h => h(App),
+  router
 }).$mount('#app')
