@@ -1,5 +1,5 @@
 import Vue from 'vue/dist/vue.js'
-import App from './App.vue'
+import app from './app.vue'
 import BootstrapVue from 'bootstrap-vue'
 import VueRouter from 'vue-router'
 
@@ -11,12 +11,12 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 // set up routes
 
-import Register from './components/Register.vue'
-import Timeline from './components/Timeline.vue'
+import aRegister from './components/register/register.vue'
+import aTimeline from './components/timeline/timeline.vue'
 
 const routes = [
-  { name: 'REGISTER', path: '/', component: Register},
-  { name: 'TIMELINE', path: '/timeline', component: Timeline}
+  { name: 'REGISTER', path: '/', component: aRegister},
+  { name: 'TIMELINE', path: '/timeline', component: aTimeline}
 ]
 
 const router = new VueRouter({
@@ -27,6 +27,6 @@ const router = new VueRouter({
 Vue.config.productionTip = false;
 
 new Vue({
-  render: h => h(App),
+  render: h => h(app),
   router
 }).$mount('#app')

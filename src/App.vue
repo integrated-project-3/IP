@@ -1,18 +1,18 @@
-<template>
+<template lang="html">
   <b-container id="app" fluid>
-    <Header />
+    <a-header />
     <router-view></router-view>
   </b-container>
 </template>
 
 <script>
 
-import Header from './components/Header.vue'
+import aHeader from './components/header/header.vue'
 
 export default {
   name: 'app',
   components: {
-    Header
+    aHeader
   }
 }
 </script>
@@ -26,5 +26,13 @@ export default {
 
 body, #app {
   background-color: $background;
+}
+
+button {
+  border: none;
+  border-radius: 2px;
+  width: 94px;
+  height: 36px;
+  font-size: 16px;
 }
 </style>
