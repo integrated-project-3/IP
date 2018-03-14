@@ -6,9 +6,9 @@
       -->
       <a-logo />
     </b-col>
-    <b-col md="6"align-self="center">
+    <b-col md="6" align-self="center">
       <!--
-        Adds a serach box. Calls the search function when it emits a searched event.
+        Adds a search box. Calls the search function when it emits a searched event.
       -->
       <a-search @searched="search"></a-search>
     </b-col>
@@ -36,6 +36,7 @@ export default {
       Called when the user searches.
     */
     search: function(searchValue) {
+      console.log(searchValue)
     }
   }
 }

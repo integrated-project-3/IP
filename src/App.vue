@@ -26,6 +26,7 @@ export default {
 
 body, #app {
   background-color: $background;
+  height: 100%;
 }
 
 button {
