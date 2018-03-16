@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "animate.css": "^3.6.1",
     "aws-sdk": "^2.206.0",
     "axios": "^0.18.0",
     "bootstrap-vue": "^2.0.0-rc.2",

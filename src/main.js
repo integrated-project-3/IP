@@ -6,6 +6,8 @@ import VueRouter from 'vue-router'
 Vue.use(BootstrapVue)
 Vue.use(VueRouter)
 
+Vue.config.productionTip = false
+
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
@@ -20,11 +22,9 @@ const routes = [
 ]
 
 const router = new VueRouter({
+  mode: 'history',
   routes
 })
-
-// try and fail to turn off productionTip
-Vue.config.productionTip = false;
 
 new Vue({
   render: h => h(app),

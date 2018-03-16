@@ -2,8 +2,8 @@
   <b-row class="selection-handler" v-if="selectCount>0">
     <b-col lg="8" offset-lg="2" md="10" offset-md="1">
       <h2>{{ selectCount }} timeline<span v-if="this.selectCount>1">s</span> selected</h2>
-      <b-btn id="delete" @click="del">Delete</b-btn>
-      <b-btn id="cancel" @click="cancel">Cancel</b-btn>
+      <b-btn variant="delete" @click="del">Delete</b-btn>
+      <b-btn variant="cancel" @click="cancel">Cancel</b-btn>
     </b-col>
   </b-row>
 </template>
@@ -51,8 +51,7 @@ export default {
       display: inline;
       float: left;
     }
-    #cancel {background-color: $cancel;}
-    #delete {background-color: $delete;margin-left: 20px}
+    .btn-delete {margin-left: 20px}
     button {
       float: right;
       border: none;

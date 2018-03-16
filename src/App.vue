@@ -19,21 +19,4 @@ export default {
 
 <style lang="scss">
 @import './assets/styles/theme.scss';
-
-* {
-  font-family: 'Gill Sans MT';
-}
-
-body, #app {
-  background-color: $background;
-  height: 100%;
-}
-
-button {
-  border: none;
-  border-radius: 2px;
-  width: 94px;
-  height: 36px;
-  font-size: 16px;
-}
 </style>
