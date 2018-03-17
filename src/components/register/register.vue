@@ -12,6 +12,8 @@
                   @row-clicked="rowClicked"
                   @sort-changed="sortChanged"
                   @row-dblclicked="openTimeline"
+                  id="my-table"
+                  ref="table"
                   >
         </b-table>
       </b-col>
@@ -49,10 +51,7 @@
 <script>
 
 import aSelectionHandler from '../selection-handler/selection-handler.vue'
-import axios from 'axios'
 import {formatDate} from '../../scripts/script'
-
-var selectCount = 0
 
 /*
   The columns of the table.
@@ -61,7 +60,8 @@ const fields = [
   { key: 'title', sortable: true},
   { key: 'date', sortable: true, formatter: 'dateFormatter' }
 ]
-var timelines = []
+
+var lastSelected = {}
 
 /*
   Default sort.
@@ -79,46 +79,14 @@ function clearSort() {
   sort.desc = ''
 }
 
-/*
-  Called when clearing all selected rows.
-  Parameter this(t) to access the selectCount.
-*/
-function clearSelected(t) {
-  for (var i = 0; i < timelines.length; i++) {
-    var timeline = timelines[i]
-    timeline.selected = false
-    timeline._rowVariant = ''
-  }
-  t.selectCount = 0
-}
-/*
-  Called when selecting a row.
-  Parameter this(t) to access the selectCount.
-  Parameter item that is being selected.
-*/
-function selectRow(item, t) {
+function selectRow(item) {
   item.selected = true,
   item._rowVariant = 'select'
-  t.selectCount++
+  lastSelected = item
 }
-/*
-  Called when deselecting a row.
-  Parameter this(t) to access selectCount.
-  Parameter item that is being deselected.
-*/
-function deselectRow(item, t) {
+function deselectRow(item) {
   item.selected = false,
   item._rowVariant = ''
-  t.selectCount--
-}
-/*
-  Called when selecting between two rows by shift clicking.
-  Parameter this(t) to access selectCount.
-  Parameter item that is being selected.
-*/
-function selectBetweenRows(item, t) {
-  console.log(item, t)
-  console.log(timelines)
 }
 
 function validTitle(str) {
@@ -127,37 +95,6 @@ function validTitle(str) {
     return true
   }
   return false
-}
-
-/*
-  Calls AWS API which invokes a lambda function.
-  The lambda calls the ideagen API and modifies some of the data before returning it.
-*/
-function fetchTimelines() {
-  timelines.splice(0, timelines.length)
-  axios.get('https://b0qss3eydk.execute-api.eu-west-2.amazonaws.com/aileron/GetTimelines', {
-    headers: {
-      'X-Api-Key': 'zQfYRHZ1vY3GFnvDZep8Z5KqlHsOKxgf1vnldchF'
-    }
-  })
-  .then((data) => {
-    //return data.data
-    for (var i = 0; i < data.data.length; i++) {
-      var item = data.data[i]
-      var timeline = {
-         title: item.Title,
-         date: item.CreationTimeStamp,
-         isDeleted: item.isDeleted,
-         id: item.Id,
-         selected: false,
-         _rowVariant: ''
-      }
-      timelines.push(timeline)
-    }
-  })
-  .catch(error => {
-    console.log(error)
-  })
 }
 
 export default {
@@ -169,8 +106,6 @@ export default {
     return {
       fields,
       sort,
-      selectCount,
-      timelines,
       newTimelineTitle: '',
       showTitleWarning: false,
       modal: false,
@@ -178,17 +113,33 @@ export default {
       modalType: ''
     }
   },
-  //eslint-disable-next-line
-  beforeRouteEnter(to, from, next) {
-    //eslint-disable-next-line
-    next(vm => {
-      fetchTimelines()
-    })
+  computed: {
+    timelines() {
+      return this.$store.state.timelines
+    },
+    selectCount() {
+      return this.$store.getters.selectedTimelines.length
+    }
   },
   methods: {
+    clearSelected: function() {
+      for (var i = 0; i < this.$store.state.timelines.length; i++) {
+        var timeline = this.$store.state.timelines[i]
+        timeline.selected = false
+        timeline._rowVariant = ''
+      }
+    },
+    selectBetweenRows: function(iStart) {
+      let timelines = this.$store.state.timelines
+      var iEnd = timelines.indexOf(lastSelected)
+      for (var i = Math.min(iStart, iEnd); i < Math.max(iStart, iEnd); i++) {
+        timelines[i].selected = true
+        timelines[i]._rowVariant = 'select'
+      }
+    },
     /* Called when the cancel button is clicked on the selection-handler. */
     cancel: function() {
-      clearSelected(this)
+      this.clearSelected()
     },
     /*
       By default the b-table sort just loops between ascending and descending.
@@ -208,28 +159,28 @@ export default {
     rowClicked: function(item, index, event) {
       if (item.selected) {
         if (event.ctrlKey) {
-          deselectRow(item, this)
+          deselectRow(item)
         } else if (!event.shiftKey) {
           if (this.selectCount > 1) {
-            clearSelected(this)
-            selectRow(item, this)
+            this.clearSelected(this)
+            selectRow(item)
           } else {
-            deselectRow(item, this)
+            deselectRow(item)
           }
         }
       } else {
         if (event.ctrlKey) {
-          selectRow(item, this)
+          selectRow(item)
         } else if (event.shiftKey) {
-          selectRow(item, this)
-          if (this.selectCount > 1) {
-            selectBetweenRows(item, this)
+          if (this.selectCount > 0) {
+            this.selectBetweenRows(index)
           }
+          selectRow(item)
         } else {
           if (this.selectCount > 0) {
-            clearSelected(this)
+            this.clearSelected()
           }
-          selectRow(item, this)
+          selectRow(item)
         }
       }
     },
@@ -247,39 +198,14 @@ export default {
         this.showTitleWarning = true
         return
       }
-      var a = axios.put('https://b0qss3eydk.execute-api.eu-west-2.amazonaws.com/aileron/CreateTimeline', {
-        'Title': this.newTimelineTitle
-      }, {
-        headers: {
-          'X-Api-Key': 'zQfYRHZ1vY3GFnvDZep8Z5KqlHsOKxgf1vnldchF'
-        }
-      }).catch(error => {
-        console.log(error)
-      })
       this.closeModal()
-      // eslint-disable-next-line
-      a.then(response => {
-        console.log(response)
-        fetchTimelines()
-      })
+      this.$store.dispatch('createTimeline', this.newTimelineTitle)
     },
     deleteTimeline: function() {
-      for (var i = timelines.length-1; i >= 0; i--) {
-        if (timelines[i].selected === true) {
-          axios.put('https://b0qss3eydk.execute-api.eu-west-2.amazonaws.com/aileron/DeleteTimeline', {
-            'TimelineId': timelines[i].id
-          }, {
-            headers: {
-              'X-Api-Key': 'zQfYRHZ1vY3GFnvDZep8Z5KqlHsOKxgf1vnldchF'
-            }
-          }).catch(error => {
-            console.log(error)
-          })
-          this.timelines.splice(i,1)
-          this.selectCount -= 1
-        }
-      }
       this.closeModal()
+      this.$store.dispatch('deleteSelectedTimelines').then(() => {
+        this.selectCount = 0
+      })
     },
     changeTitle: function() {
       alert("edited")

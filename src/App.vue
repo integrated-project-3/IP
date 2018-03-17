@@ -6,7 +6,6 @@
 </template>
 
 <script>
-
 import aHeader from './components/header/header.vue'
 
 export default {
