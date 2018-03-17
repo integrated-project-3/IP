@@ -1,18 +1,23 @@
 <template >
   <div class="timeline">
-    <b-row class="head" align-v="start">
-      <b-col>
-        <b-btn variant="select" @click="back">Back</b-btn>
-      </b-col>
-      <b-col>
-        <span class="timeline-details">
-        </span>
-      </b-col>
-      <b-col>
-        <b-btn variant="create" @click="openModal" style="float: right;">Create new event</b-btn>
-      </b-col>
-    </b-row>
-    <b-row></b-row>
+    <div>
+      <b-row class="head" align-v="start">
+        <b-col md="3">
+          <b-btn variant="select" @click="back">Back</b-btn>
+        </b-col>
+        <b-col>
+          <span class="timeline-details">
+            <h1>{{title}}</h1>
+            <p>
+              {{date}}
+            </p>
+          </span>
+        </b-col>
+        <b-col>
+          <b-btn variant="create" @click="openModal" style="float: right;">Create new event</b-btn>
+        </b-col>
+      </b-row>
+    </div>
   </div>
 </template>
 
@@ -23,6 +28,17 @@ export default {
   name: 'aTimeline',
   data() {
     return {
+    }
+  },
+  computed: {
+    timeline() {
+      return this.$store.state.currentTimeline
+    },
+    title() {
+      return this.timeline.title
+    },
+    date() {
+      return formatDate(this.timeline.date)
     }
   },
   methods: {

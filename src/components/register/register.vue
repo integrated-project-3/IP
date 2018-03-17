@@ -12,8 +12,6 @@
                   @row-clicked="rowClicked"
                   @sort-changed="sortChanged"
                   @row-dblclicked="openTimeline"
-                  id="my-table"
-                  ref="table"
                   >
         </b-table>
       </b-col>
@@ -58,13 +56,10 @@ import {formatDate} from '../../scripts/script'
 */
 const fields = [
   { key: 'title', sortable: true},
-  { key: 'date', sortable: true, formatter: 'dateFormatter' }
+  { key: 'date', sortable: true, formatter: 'formatDate' }
 ]
-
-var lastSelected = {}
-
 /*
-  Default sort.
+Default sort.
 */
 var sort = {
   by: 'date',
@@ -78,6 +73,8 @@ function clearSort() {
   sort.by = ''
   sort.desc = ''
 }
+
+var lastSelected = {}
 
 function selectRow(item) {
   item.selected = true,
@@ -110,7 +107,8 @@ export default {
       showTitleWarning: false,
       modal: false,
       modalTitle: '',
-      modalType: ''
+      modalType: '',
+      formatDate
     }
   },
   computed: {
@@ -122,6 +120,7 @@ export default {
     }
   },
   methods: {
+    /* Clear all selected. */
     clearSelected: function() {
       for (var i = 0; i < this.$store.state.timelines.length; i++) {
         var timeline = this.$store.state.timelines[i]
@@ -129,6 +128,7 @@ export default {
         timeline._rowVariant = ''
       }
     },
+    /* Select rows between 2 rows when shift click. */
     selectBetweenRows: function(iStart) {
       let timelines = this.$store.state.timelines
       var iEnd = timelines.indexOf(lastSelected)
@@ -162,7 +162,7 @@ export default {
           deselectRow(item)
         } else if (!event.shiftKey) {
           if (this.selectCount > 1) {
-            this.clearSelected(this)
+            this.clearSelected()
             selectRow(item)
           } else {
             deselectRow(item)
@@ -186,11 +186,8 @@ export default {
     },
     /* When a row is doulbe clicked, open that timeline. */
     openTimeline: function(item) {
-      sessionStorage.setItem('timelineId', item.id)
+      this.$store.commit('setCurrentTimeline', item)
       this.$router.push({name: 'TIMELINE'})
-    },
-    dateFormatter: function(ticks) {
-      return formatDate(ticks)
     },
     createTimeline() {
       if (!validTitle(this.newTimelineTitle)) {
@@ -203,9 +200,7 @@ export default {
     },
     deleteTimeline: function() {
       this.closeModal()
-      this.$store.dispatch('deleteSelectedTimelines').then(() => {
-        this.selectCount = 0
-      })
+      this.$store.dispatch('deleteSelectedTimelines')
     },
     changeTitle: function() {
       alert("edited")

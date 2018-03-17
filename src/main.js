@@ -6,6 +6,7 @@ import Vuex from 'vuex'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import axios from 'axios'
+import createPersistedState from 'vuex-persistedstate'
 
 
 Vue.use(BootstrapVue)
@@ -52,8 +53,10 @@ fetchTimelines()
 
 const store = new Vuex.Store({
   state: {
-    timelines: timelines
+    timelines: timelines,
+    currentTimeline: null
   },
+  plugins: [createPersistedState()],
   mutations: {
     addTimeline (state, timeline) {
       state.timelines.push(timeline)
@@ -65,6 +68,9 @@ const store = new Vuex.Store({
           return
         }
       }
+    },
+    setCurrentTimeline(state, timeline) {
+      state.currentTimeline = timeline
     }
   },
   getters: {
@@ -123,15 +129,12 @@ const store = new Vuex.Store({
       })
     },
     deleteSelectedTimelines({ state }) {
-      return new Promise((resolve) => {
-        for (var i = state.timelines.length-1; i >= 0; i--) {
-          var timeline = state.timelines[i]
-          if (timeline.selected === true) {
-            this.dispatch('deleteTimeline', timeline.id)
-          }
+      for (var i = state.timelines.length-1; i >= 0; i--) {
+        var timeline = state.timelines[i]
+        if (timeline.selected === true) {
+          this.dispatch('deleteTimeline', timeline.id)
         }
-        resolve()
-      })
+      }
     }
   }
 })
