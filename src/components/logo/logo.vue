@@ -8,9 +8,7 @@
       <img src="../../assets/images/logo.png" :alt="alt" />
     </router-link>
     <a href=link v-else>
-      <!--
-        Same as above.
-      -->
+      <!-- Same as above. -->
       <img src="../../assets/images/logo.png" :alt="alt" />
     </a>
   </div>

@@ -17,7 +17,7 @@
       </b-col>
       <b-col></b-col> <!-- used to center the table -->
     </b-row>
-    <a-selection-handler :select-count="selectCount" @del="openModal('deleteTimeline')" @cancel="cancel"></a-selection-handler>
+    <a-selection-handler :select-count="selectCount" @del="openModal('deleteTimeline')" @cancel="cancel" @edit="openModal('editTitle')"></a-selection-handler>
     <b-modal  v-model="modal" :title="modalTitle" @shown="modalOpened" @hidden="modalClosed">
       <b-container fluid>
         <b-row>
@@ -30,7 +30,7 @@
               Are you sure you wish to delete selected timelines?
             </p>
           </b-col>
-          <b-col v-else-if="modalType === 'editTimeline'">
+          <b-col v-else-if="modalType === 'editTitle'">
             <input type="text" v-model="newTimelineTitle" @keyup.enter="changeTitle" @keyup="checkTitleInput" placeholder="Enter new title" id="titleInput" />
             <b-alert variant="danger" :show="showTitleWarning">Title must be at least 5 characters long</b-alert>
           </b-col>
@@ -40,7 +40,7 @@
         <b-btn class="float-left" @click="closeModal">CANCEL</b-btn>
         <b-btn v-if="modalType === 'createTimeline'" class="float-right" @click="createTimeline">CREATE</b-btn>
         <b-btn v-else-if="modalType === 'deleteTimeline'" class="float-right" @click="deleteTimeline">DELETE</b-btn>
-        <b-btn v-else-if="modalType === 'editTimeline'" class="float-right" @click="changeTitle">SAVE</b-btn>
+        <b-btn v-else-if="modalType === 'editTitle'" class="float-right" @click="changeTitle">SAVE</b-btn>
       </div>
     </b-modal>
   </div>
@@ -203,7 +203,13 @@ export default {
       this.$store.dispatch('deleteSelectedTimelines')
     },
     changeTitle: function() {
-      alert("edited")
+      if (!validTitle(this.newTimelineTitle)) {
+        document.getElementById('titleInput').focus()
+        this.showTitleWarning = true
+        return
+      }
+      this.closeModal()
+      this.$store.dispatch('changeTimelineTitle', this.newTimelineTitle)
     },
     /* Called when a key is pressed on the create modal input. */
     checkTitleInput: function() {
@@ -231,13 +237,14 @@ export default {
         this.modalTitle = "Create"
       } else if (this.modalType === "deleteTimeline") {
         this.modalTitle = "Delete"
-      } else if (this.modalType === "editTimeline") {
+      } else if (this.modalType === "editTitle") {
         document.getElementById('titleInput').focus()
         this.modalTitle = "Edit"
       }
     },
     modalClosed: function() {
-      if (this.modalType === "createTimeline" || this.modalType === "editTimeline") {
+      if (this.modalType === "createTimeline" || this.modalType === "editTitle") {
+        this.clearSelected()
         this.newTimelineTitle = ''
         this.showTitleWarning = false
       }

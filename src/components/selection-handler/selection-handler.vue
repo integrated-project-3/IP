@@ -4,6 +4,7 @@
       <h2>{{ selectCount }} timeline<span v-if="this.selectCount>1">s</span> selected</h2>
       <b-btn variant="delete" @click="del">Delete</b-btn>
       <b-btn variant="cancel" @click="cancel">Cancel</b-btn>
+      <b-btn v-if="selectCount === 1" variant="info" @click="edit">Edit</b-btn>
     </b-col>
   </b-row>
 </template>
@@ -18,19 +19,14 @@ export default {
     }
   },
   methods: {
-    /*
-      Called when delete button is clicked.
-      Emits a del event.
-    */
     del: function() {
       this.$emit("del")
     },
-    /*
-      Called when cancel button is clicked.
-      Emits a cancel event.
-    */
     cancel: function() {
       this.$emit("cancel")
+    },
+    edit: function() {
+      this.$emit("edit")
     }
   }
 }
@@ -52,6 +48,7 @@ export default {
       float: left;
     }
     .btn-delete {margin-left: 20px}
+    .btn-cancel {margin-left: 20px}
     button {
       float: right;
       border: none;

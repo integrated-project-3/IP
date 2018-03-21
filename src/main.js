@@ -2,12 +2,13 @@ import Vue from 'vue/dist/vue.js'
 import app from './app.vue'
 import BootstrapVue from 'bootstrap-vue'
 import VueRouter from 'vue-router'
-import Vuex from 'vuex'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import axios from 'axios'
+import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
-
+import router from './router'
+// import store from './store'
 
 Vue.use(BootstrapVue)
 Vue.use(VueRouter)
@@ -17,25 +18,23 @@ Vue.config.productionTip = false
 
 var timelines = []
 
-/*
-  Calls AWS API which invokes a lambda function.
-  The lambda calls the ideagen API and modifies some of the data before returning it.
-*/
 function fetchTimelines() {
   timelines.splice(0, timelines.length)
-  axios.get('https://b0qss3eydk.execute-api.eu-west-2.amazonaws.com/aileron/GetAllTimelinesAndEvents', {
+  axios.get('https://gcu.ideagen-development.com/Timeline/GetAllTimelinesAndEvent', {
     headers: {
-      'X-Api-Key': 'zQfYRHZ1vY3GFnvDZep8Z5KqlHsOKxgf1vnldchF'
+      'TenantId': 'Team19',
+      'AuthToken': '7cbc5c61-bcfa-47d8-a171-599616102147'
     }
   })
   .then((data) => {
-    for (var i = 0; i < data.data.length; i++) {
-      var item = data.data[i]
+    for (var i = 0; i < data.data.Timelines.length; i++) {
+      var item = data.data.Timelines[i]
       var timeline = {
          title: item.Title,
          date: item.CreationTimeStamp,
          isDeleted: item.isDeleted,
          id: item.Id,
+         timelineEvents: item.TimelineEvents,
          selected: false,
          _rowVariant: ''
       }
@@ -49,14 +48,11 @@ function fetchTimelines() {
 
 fetchTimelines()
 
-// vuex store
-
 const store = new Vuex.Store({
   state: {
-    timelines: timelines,
+    timelines,
     currentTimeline: null
   },
-  plugins: [createPersistedState()],
   mutations: {
     addTimeline (state, timeline) {
       state.timelines.push(timeline)
@@ -71,24 +67,24 @@ const store = new Vuex.Store({
     },
     setCurrentTimeline(state, timeline) {
       state.currentTimeline = timeline
-    }
-  },
-  getters: {
-    selectedTimelines: (state) => {
-      return state.timelines.filter(timeline => timeline.selected)
+    },
+    updateTimelineTitle(state, payload) {
+      for (var i = 0; i < state.timelines.length; i++) {
+        if (state.timelines[i].id === payload.id) {
+          state.timelines[i].title = payload.title
+          return
+        }
+      }
     }
   },
   actions: {
     createTimeline ({ commit }, title) {
-      axios.put('https://b0qss3eydk.execute-api.eu-west-2.amazonaws.com/aileron/CreateTimeline',
+      axios.put('https://gcu.ideagen-development.com/Timeline/Create',
         {
-          'Title': title
-        },
-        {
-          headers:
-          {
-            'X-Api-Key': 'zQfYRHZ1vY3GFnvDZep8Z5KqlHsOKxgf1vnldchF'
-          }
+          'AuthToken':'7cbc5c61-bcfa-47d8-a171-599616102147',
+          'TenantId':'Team19',
+          'Title': title,
+          'TimelineId':'e4264382-87f6-4a01-a5ed-174811691a4f'
         }
       ).then(response => {
         var item = response.data
@@ -100,6 +96,7 @@ const store = new Vuex.Store({
           selected: false,
           _rowVariant: ''
         }
+        console.log(timeline)
         commit('addTimeline', timeline)
       })
       .catch(error => {
@@ -107,25 +104,17 @@ const store = new Vuex.Store({
       })
     },
     deleteTimeline({ commit }, id) {
-      return new Promise((resolve, reject) => {
-        axios.put('https://b0qss3eydk.execute-api.eu-west-2.amazonaws.com/aileron/DeleteTimeline',
-          {
-            'TimelineId': id
-          },
-          {
-            headers:
-            {
-              'X-Api-Key': 'zQfYRHZ1vY3GFnvDZep8Z5KqlHsOKxgf1vnldchF'
-            }
-          }
-        ).then(() => {
-          commit('removeTimeline', id)
-          resolve()
-        })
-        .catch(error => {
-          console.log(error)
-          reject()
-        })
+      axios.put('https://gcu.ideagen-development.com/Timeline/Delete',
+        {
+          'AuthToken':'7cbc5c61-bcfa-47d8-a171-599616102147',
+          'TenantId':'Team19',
+          'TimelineId':id
+        }
+      ).then(() => {
+        commit('removeTimeline', id)
+      })
+      .catch(error => {
+        console.log(error)
       })
     },
     deleteSelectedTimelines({ state }) {
@@ -135,31 +124,41 @@ const store = new Vuex.Store({
           this.dispatch('deleteTimeline', timeline.id)
         }
       }
+    },
+    changeTimelineTitle({ commit }, title) {
+      var id = this.getters.selectedTimelines[0].id
+      axios.put('https://gcu.ideagen-development.com/Timeline/EditTitle',
+        {
+          'AuthToken':'7cbc5c61-bcfa-47d8-a171-599616102147',
+          'TenantId':'Team19',
+          'Title': title,
+          'TimelineId': id
+        }
+      ).then(response => {
+        var item = response.data
+        var timeline = {
+          title: item.Title,
+          date: item.CreationTimeStamp,
+          isDeleted: item.IsDeleted,
+          id: item.Id,
+          selected: false,
+          _rowVariant: ''
+        }
+        commit('updateTimelineTitle', {id, title})
+      })
+      .catch(error => {
+        console.log(error)
+      })
     }
-  }
-})
-
-// set up routes
-
-import aRegister from './components/register/register.vue'
-import aTimeline from './components/timeline/timeline.vue'
-
-const routes = [
-  {
-    name: 'REGISTER',
-    path: '/',
-    component: aRegister
   },
-  {
-    name: 'TIMELINE',
-    path: '/timeline',
-    component: aTimeline
-  }
-]
-
-const router = new VueRouter({
-  mode: 'history',
-  routes
+  getters: {
+    selectedTimelines: (state) => {
+      return state.timelines.filter(timeline => timeline.selected)
+    }
+  },
+  plugins: [createPersistedState({
+    paths: ['currentTimeline']
+ })]
 })
 
 new Vue({

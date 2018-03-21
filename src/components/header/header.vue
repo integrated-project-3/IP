@@ -1,15 +1,11 @@
 <template lang="html">
   <b-row class="header" align-v="start">
     <b-col md="6">
-      <!--
-        Adds a logo which when clicked goes to the register.
-      -->
+      <!-- Adds a logo which when clicked goes to the register. -->
       <a-logo />
     </b-col>
     <b-col md="6" align-self="center">
-      <!--
-        Adds a search box. Calls the search function when it emits a searched event.
-      -->
+      <!-- Adds a search box. Calls the search function when it emits a searched event. -->
       <a-search @searched="search"></a-search>
     </b-col>
   </b-row>
@@ -32,9 +28,7 @@ export default {
     }
   },
   methods: {
-    /*
-      Called when the user searches.
-    */
+    /* Called when the user searches. */
     search: function(searchValue) {
       console.log(searchValue)
     }
