@@ -1,8 +1,3 @@
-/*
-  Used to format the ticks returned by the API to readable string.
-  Could be done in the lambda before returning the data, however keeping the ticks
-  means that the date can be sorted correctly.
-*/
 function formatDate(ticks) {
   const epochTicks = 621355968000000000;
   const ticksSinceEpoch = ticks - epochTicks;
@@ -11,4 +6,11 @@ function formatDate(ticks) {
   return date.toLocaleDateString()
 }
 
-export {formatDate}
+function formatAttachmentTime(dateTime) {
+  if (dateTime.length === 16) {
+    return dateTime.substring(11,17)
+  }
+  return "Time not available"
+}
+
+export {formatDate, formatAttachmentTime}
