@@ -49,7 +49,6 @@ export default {
 @import '../../assets/styles/theme.scss';
 
 i {
-  cursor: pointer;
   position: absolute;
 }
 .icon {

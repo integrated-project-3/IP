@@ -49,7 +49,7 @@
 <script>
 
 import aSelectionHandler from '../selection-handler/selection-handler.vue'
-import {formatDate} from '../../scripts/script'
+import {formatDate, validTitle} from '../../scripts/script'
 
 /*
   The columns of the table.
@@ -86,13 +86,7 @@ function deselectRow(item) {
   item._rowVariant = ''
 }
 
-function validTitle(str) {
-  var s = str.replace(/\s/g,'')
-  if (s.length >= 5) {
-    return true
-  }
-  return false
-}
+
 
 export default {
   name: 'aRegister',

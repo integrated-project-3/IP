@@ -1,15 +1,27 @@
 <template lang="html">
   <div class="events" id="container" @mousedown="drag($event, 'down')" @mousemove="drag($event, 'drag')" @mouseup="drag($event, 'up')">
     <div id="slider">
-      <div class="event" v-for="(e, index) in events" :key="e.id">
+      <div class="event" v-for="(e, index) in eventsInOrder" :key="e.id">
         <div class="time" v-if="index === 0 || index === events.length-1">
           <p>{{formatAttachmentTime(e.EventDateTime)}}</p>
         </div>
-        <div class="title" id="title" @click="clickedTitle($event)">
+        <div class="title" :id="e.Id" @click="clickedTitle($event)">
           <p>{{e.Title}}</p>
         </div>
         <div v-if="index != events.length-1" id="h-line"></div>
-        <div v-if="index === 0 || index === events.length-1" id="v-line"></div>
+        <div v-if="index === 0 || index === events.length-1" id="v-line-time" class="v-line"></div>
+        <div v-if="selectedEvent.Id === e.Id" id="v-line-title" class="v-line"></div>
+      </div>
+      <div class="info" id="event-info">
+        <div v-if="selectedEvent.Id != ''" >
+          <h2>{{selectedTitle}}<i class="material-icons icon" style="padding-left: 5px;">edit</i></h2>
+          <h4>{{selectedTime}}</h4>
+          <p>
+            {{selectedDescription}}
+          </p>
+          <b-btn variant="create" @click="openEvent">More</b-btn>
+          <b-btn variant="delete" @click="deleteEvent" style="float: right;">Delete</b-btn>
+        </div>
       </div>
     </div>
   </div>
@@ -30,33 +42,54 @@ export default {
   data() {
     return {
       formatAttachmentTime,
-      scale
+      scale,
+      selectedEvent: {
+        'Id': '',
+        'Title': '',
+        'EventDateTime': '',
+        'Description': '',
+        'IsDeleted': '',
+        'Location': '',
+        'LinkedTimelineEventIds': [],
+        'Attachments': []
+      }
     }
   },
   mounted() {
     var slider = document.getElementById("slider")
     slider.style.width = 375 * this.events.length + "px"
     require('mouse-wheel')((dx, dy, dz, ev) => {
-      if (dy > 0 && this.scale > .2) {
-        this.scale -= .1
+      if (ev.ctrlKey) {
+        ev.preventDefault()
+        if (dy > 0 && this.scale > .2) {
+          this.scale -= .1
+        }
+        if (dy < 1.2) {
+          this.scale += .1
+        }
+        slider.style.transform = "scale("+this.scale+")"
       }
-      if (dy < 0) {
-        this.scale += .1
-      }
-
-      // var windowHalfWidth = $("#container").width()/2
-      // var minLeft = windowHalfWidth * 2 - slider.style.width.substring(0,slider.style.width.length-2) * this.scale
-      // var xSelf = ev.pageX - $("#container").offset().left - parseFloat($("#slider").css("left"));
-      // var newLeft
-      // if (this.scale != 1) {
-      //   newLeft = Math.min(Math.max((-(xSelf / 0.55 - windowHalfWidth)), minLeft), 0);
-      // } else {
-      //   newLeft = Math.min(Math.max((-(xSelf * 0.55 - windowHalfWidth)), minLeft), 0);
-      // }
-      // slider.style.left = newLeft + "px"
-
-      slider.style.transform = "scale("+this.scale+")"
     })
+  },
+  computed: {
+    eventsInOrder() {
+      return this.events
+    },
+    selectedTitle() {
+      if (this.selectedEvent.Title != null)
+        return this.selectedEvent.Title
+      return ""
+    },
+    selectedTime() {
+      if (this.selectedEvent.EventDateTime != null)
+        return formatAttachmentTime(this.selectedEvent.EventDateTime)
+      return ""
+    },
+    selectedDescription() {
+      if (this.selectedEvent.Description != null)
+        return this.selectedEvent.Description.substr(0,90) + '...'
+      return ""
+    }
   },
   props: {
     events: {
@@ -80,31 +113,70 @@ export default {
       }
     },
     clickedTitle: function(event) {
+      if (event.srcElement.classList.contains("selected")) {
+        this.clearSelected()
+        return
+      }
       this.clearSelected()
       event.srcElement.classList.add("selected")
+      this.selectedEvent = this.getEventFromId(event.srcElement.id)
+
+      var eventX = event.srcElement.offsetLeft
+
+      var info = document.getElementById("event-info")
+      info.style.left = eventX + "px"
+
     },
     clearSelected: function() {
       var selected = document.getElementsByClassName("selected")
       for (var i = selected.length-1; i >= 0; i--) {
         selected[0].classList.remove("selected")
       }
+      this.selectedEvent = {
+        'Id': '',
+        'Title': '',
+        'EventDateTime': '',
+        'Description': '',
+        'IsDeleted': '',
+        'Location': '',
+        'LinkedTimelineEventIds': [],
+        'Attachments': []
+      }
+    },
+    getEventFromId: function(id) {
+      return this.events.filter(event => event.Id === id)[0]
+    },
+    editEventTitle: function() {
+
+    },
+    openEvent: function() {
+
+    },
+    deleteEvent: function() {
+
     }
   }
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import '../../assets/styles/theme.scss';
 @import '../../assets/styles/main.scss';
+
 .events {
   overflow: hidden;
   height: 500px;
   cursor: pointer;
+  width: 100vw;
+  height: 500px;
+  box-shadow: 0 0 5px 5px rgba(0, 0, 0, .1);
+  padding-top: 10px;
   #slider {
     position: relative;
     top: 0;
     left: 0;
     transform-origin: 0 0;
+    pointer-events: none;
   }
   #h-line {
     width: 75px;
@@ -113,12 +185,18 @@ export default {
     top: -35px;
     right: -300px;
   }
-  #v-line {
+  .v-line {
     height: 50px;
     border-left: 1px solid black;
-    position: relative;
-    left: 150px;
-    top: -120px
+    &#v-line-title {
+      position: relative;
+      left: 150px;
+    }
+    &#v-line-time {
+      position: absolute;
+      margin-left: 150px;
+      margin-top: -120px;
+    }
   }
   .event {
     margin-left: 37.5px;
@@ -126,6 +204,7 @@ export default {
     display: inline-block;
     text-align: center;
     cursor: default;
+    pointer-events: all;
     p {
       position: relative;
       top: 50%;
@@ -151,6 +230,24 @@ export default {
         background-color: $select;
         color: white;
       }
+    }
+  }
+  .info {
+    position: absolute;
+    pointer-events: all;
+    cursor: default;
+  }
+  .info div{
+    background-color: white;
+    box-shadow: 0 16px 16px rgba(0, 0, 0, .16);
+    width: 300px;
+    max-height: 200px;
+    padding: 10px;
+    .icon {
+      cursor: pointer;
+    }
+    #delete-event {
+      font-size: 19px;
     }
   }
 }

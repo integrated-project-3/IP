@@ -1,6 +1,6 @@
 @import './theme.scss';
 
-*, body, #app {
+*, html, body, #app {
   /*
     Stops timelines from highlighting when shift clicking.
   */
@@ -10,7 +10,6 @@
   -moz-user-select: none; /* Gecko (Firefox) */
   -webkit-user-select: none; /* Webkit (Safari, Chrome) */
 }
-
 body, #app {
   background-color: $background;
   height: 100%;
@@ -26,14 +25,24 @@ body, #app {
     color: $text;
   }
   input {
-    width: 100%;
-    background: $background;
+    &[type="text"]{
+      width: 100%;
+      background: $background;
+    }
     border: none;
     font-size: 1.5em;
     padding-left: 10px;
     &:focus {
       outline: none;
     }
+  }
+  textarea {
+    width: 100%;
+    max-height: 200px;
+  }
+  label {
+    font-size: 1.2em;
+    padding-right: 20px;
   }
   footer {
     border: none;
@@ -61,4 +70,11 @@ button {
   min-width: 45px;
   min-height: 45px;
   font-size: 20px;
+}
+
+/*
+  Icons
+*/
+i {
+  cursor: pointer;
 }

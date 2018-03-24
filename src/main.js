@@ -9,10 +9,13 @@ import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
 import router from './router'
 // import store from './store'
+import VueMaterial from 'vue-material'
+import 'vue-material/dist/vue-material.min.css'
 
 Vue.use(BootstrapVue)
 Vue.use(VueRouter)
 Vue.use(Vuex)
+Vue.use(VueMaterial)
 
 Vue.config.productionTip = false
 
@@ -149,6 +152,9 @@ const store = new Vuex.Store({
       .catch(error => {
         console.log(error)
       })
+    },
+    createEvent ({ commit }, title) {
+      alert("created event " + title)
     }
   },
   getters: {

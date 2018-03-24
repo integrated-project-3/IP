@@ -13,4 +13,12 @@ function formatAttachmentTime(dateTime) {
   return "Time not available"
 }
 
-export {formatDate, formatAttachmentTime}
+function validTitle(str) {
+  var s = str.replace(/\s/g,'')
+  if (s.length >= 5) {
+    return true
+  }
+  return false
+}
+
+export {formatDate, formatAttachmentTime, validTitle}
