@@ -9,13 +9,14 @@ import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
 import router from './router'
 // import store from './store'
-import VueMaterial from 'vue-material'
-import 'vue-material/dist/vue-material.min.css'
+// import VueMaterial from 'vue-material'
+// import 'vue-material/dist/vue-material.min.css'
+import {guid} from './scripts/script'
 
 Vue.use(BootstrapVue)
 Vue.use(VueRouter)
 Vue.use(Vuex)
-Vue.use(VueMaterial)
+// Vue.use(VueMaterial)
 
 Vue.config.productionTip = false
 
@@ -60,6 +61,12 @@ const store = new Vuex.Store({
     addTimeline (state, timeline) {
       state.timelines.push(timeline)
     },
+    addEvent(state, event) {
+      state.timelines[state.timelines.indexOf(state.currentTimeline)].timelineEvents.push(event)
+      // state.currentTimeline.timelineEvents.push(event)
+      // console.log(state.currentTimeline)
+      // console.log(event)
+    },
     removeTimeline(state, id) {
       for (var i = 0; i < state.timelines.length; i++) {
         if (state.timelines[i].id === id) {
@@ -87,7 +94,7 @@ const store = new Vuex.Store({
           'AuthToken':'7cbc5c61-bcfa-47d8-a171-599616102147',
           'TenantId':'Team19',
           'Title': title,
-          'TimelineId':'e4264382-87f6-4a01-a5ed-174811691a4f'
+          'TimelineId': guid()
         }
       ).then(response => {
         var item = response.data
@@ -99,7 +106,6 @@ const store = new Vuex.Store({
           selected: false,
           _rowVariant: ''
         }
-        console.log(timeline)
         commit('addTimeline', timeline)
       })
       .catch(error => {
@@ -137,24 +143,49 @@ const store = new Vuex.Store({
           'Title': title,
           'TimelineId': id
         }
-      ).then(response => {
-        var item = response.data
-        var timeline = {
-          title: item.Title,
-          date: item.CreationTimeStamp,
-          isDeleted: item.IsDeleted,
-          id: item.Id,
-          selected: false,
-          _rowVariant: ''
-        }
+      ).then(() => {
         commit('updateTimelineTitle', {id, title})
       })
       .catch(error => {
         console.log(error)
       })
     },
-    createEvent ({ commit }, title) {
-      alert("created event " + title)
+    createEvent ({state, commit}, payload) {
+      var dateTime = ''
+      var newEvent = {}
+      if (payload.type === 'exact') {
+        dateTime = payload.dateTime
+      } else if(payload.type === 'BA') {
+
+      }
+      axios.put('https://gcu.ideagen-development.com/TimelineEvent/Create',
+        {
+        'AuthToken':'7cbc5c61-bcfa-47d8-a171-599616102147',
+        'TenantId':'Team19',
+        'TimelineEventId': payload.id,
+        'Title': payload.title,
+        'Description': payload.description,
+        'EventDateTime': dateTime
+        }
+      ).then(response => {
+        newEvent = response.data
+        axios.put('https://gcu.ideagen-development.com/Timeline/LinkEvent',
+          {
+            'AuthToken':'7cbc5c61-bcfa-47d8-a171-599616102147',
+            'TenantId':'Team19',
+            'TimelineId': state.currentTimeline.id,
+            'EventId': payload.id
+          }
+        ).then(() => {
+          commit('addEvent', newEvent)
+        })
+        .catch(error => {
+          console.log(error)
+        })
+      })
+      .catch(error => {
+        console.log(error)
+      })
     }
   },
   getters: {

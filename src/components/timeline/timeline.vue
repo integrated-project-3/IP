@@ -40,11 +40,11 @@
               <b-form-checkbox id="exactDateTime" v-model="exactDateTime">Exact date and time</b-form-checkbox>
             </b-row>
             <b-row v-if="!exactDateTime">
-              <b-form-select v-model="beforeAfterSelect" :options="beforeAfterOptions" class="mb-3"/>
-              <b-form-select v-model="eventSelect" :options="eventOptions" class="mb-3"/>
+              <b-form-select v-model="beforeAfterSelect" :options="beforeAfterOptions" class="mb-3" id="beforeAfterSelect" @change="checkInput('beforeAfterSelect')"/>
+              <b-form-select v-model="eventSelect" :options="eventOptions" class="mb-3" id="eventSelect" @change="checkInput('eventSelect')"/>
             </b-row>
             <b-row v-if="exactDateTime">
-              
+              <input type="datetime-local" v-model="newEventDateTime" id="newEventDateTime" @change="checkInput('newEventDateTime')"/>
             </b-row>
           </b-col>
         </b-row>
@@ -60,8 +60,7 @@
 <script>
 import {formatDate, validTitle} from '../../scripts/script'
 import aEvents from './events'
-
-
+import {guid} from '../../scripts/script'
 
 export default {
   name: 'aTimeline',
@@ -81,7 +80,7 @@ export default {
         { value: 'after', text: 'After'}
       ],
       eventSelect: null,
-      eventDate: null
+      newEventDateTime: null
     }
   },
   components: {
@@ -102,7 +101,7 @@ export default {
     },
     eventOptions() {
       var options = [
-        { value: null, text: 'Select an event'}
+        { value: null, text: 'Select an event', disabled : true}
       ]
       for (var i = 0; i < this.events.length; i++) {
         var option = {
@@ -147,7 +146,11 @@ export default {
       if (this.modalType === "createEvent") {
         this.newEventTitle = ''
         this.newEventDescription = ''
+        this.exactDateTime = false
         this.showTitleWarning = false
+        this.beforeAfterSelect = null
+        this.eventSelect = null
+        this.newEventDateTime = null
       }
       this.modalType = ''
       this.modalTitle = ''
@@ -158,10 +161,41 @@ export default {
         this.showTitleWarning = true
         return
       }
+      if (!this.exactDateTime) {
+        if(this.beforeAfterSelect === null) {
+          var select = document.getElementById("beforeAfterSelect")
+          select.focus()
+          select.style.border = "1px solid red"
+          return
+        }
+        if(this.eventSelect === null) {
+          var eselect = document.getElementById("eventSelect")
+          eselect.focus()
+          eselect.style.border = "1px solid red"
+          return
+        }
+      } else {
+        if (this.newEventDateTime === null) {
+          var datetime = document.getElementById("newEventDateTime")
+          datetime.focus()
+          datetime.style.border = "1px solid red"
+          return
+        }
+      }
       this.closeModal()
       var payload = {
         title: this.newEventTitle,
-        description: this.newEventDescription
+        description: this.newEventDescription,
+        id: guid()
+      }
+
+      if (!this.exactDateTime) {
+        payload.beforeAfter = this.beforeAfterSelect
+        payload.eventId = this.eventSelect
+        payload.type ='BA'
+      } else {
+        payload.dateTime = this.newEventDateTime
+        payload.type = 'exact'
       }
       this.$store.dispatch('createEvent', payload)
     },
@@ -176,6 +210,12 @@ export default {
         if (validTitle(this.newEventTitle)) {
           this.showTitleWarning = false
         }
+      }
+    },
+    checkInput(id) {
+      var el = document.getElementById(id)
+      if (el.style.border === "1px solid red") {
+        el.style.border = ""
       }
     }
   }
@@ -204,5 +244,8 @@ export default {
     bottom: 0;
     padding: 20px;
   }
+}
+.md-datepicker-dialog {
+  z-index: 1200 !important;
 }
 </style>

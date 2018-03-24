@@ -1,6 +1,6 @@
 <template lang="html">
   <div class="events" id="container" @mousedown="drag($event, 'down')" @mousemove="drag($event, 'drag')" @mouseup="drag($event, 'up')">
-    <div id="slider">
+    <div id="slider" :style="{width: sliderWidth}">
       <div class="event" v-for="(e, index) in eventsInOrder" :key="e.id">
         <div class="time" v-if="index === 0 || index === events.length-1">
           <p>{{formatAttachmentTime(e.EventDateTime)}}</p>
@@ -29,7 +29,6 @@
 
 <script>
 import {formatAttachmentTime} from '../../scripts/script'
-import $ from 'jquery'
 
 var drag = false
 var lastPos = []
@@ -57,7 +56,7 @@ export default {
   },
   mounted() {
     var slider = document.getElementById("slider")
-    slider.style.width = 375 * this.events.length + "px"
+    // slider.style.width = this.sliderWidth()
     require('mouse-wheel')((dx, dy, dz, ev) => {
       if (ev.ctrlKey) {
         ev.preventDefault()
@@ -72,6 +71,9 @@ export default {
     })
   },
   computed: {
+    sliderWidth() {
+      return 375 * this.events.length + "px"
+    },
     eventsInOrder() {
       return this.events
     },

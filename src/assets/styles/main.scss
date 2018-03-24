@@ -24,7 +24,7 @@ body, #app {
     border: none;
     color: $text;
   }
-  input {
+  input:not(.md-input) {
     &[type="text"]{
       width: 100%;
       background: $background;
@@ -47,7 +47,7 @@ body, #app {
   footer {
     border: none;
   }
-  button {
+  button:not(.md-button) {
     background-color: white;
     color: $create;
     border: none;
@@ -57,7 +57,7 @@ body, #app {
 /*
   Buttons
 */
-button {
+button:not(.md-button) {
   border: none;
   border-radius: 2px;
   min-width: 94px;
@@ -77,4 +77,8 @@ button {
 */
 i {
   cursor: pointer;
+}
+
+.md-datepicker-dialog, .md-overlay, .md-datepicker-overlay {
+  z-index: 1200 !important;
 }
