@@ -51,9 +51,10 @@ const store = new Vuex.Store({
   },
   actions: {
     createTimeline ({ commit }, title) {
-      createTimeline(title).then(response => {
-        var item = response.data
-        var timeline = {
+      return new Promise ((resolve, reject) => {
+        createTimeline(title).then(response => {
+          var item = response.data
+          var timeline = {
            title: item.Title,
            date: item.CreationTimeStamp,
            isDeleted: item.IsDeleted,
@@ -61,8 +62,10 @@ const store = new Vuex.Store({
            selected: false,
            _rowVariant: ''
         }
-        timeline.timelineEvents = []
-        commit('addTimeline', timeline)
+          timeline.timelineEvents = []
+          commit('addTimeline', timeline)
+          resolve(timeline)
+        })
       })
     },
     deleteTimeline({ commit }, id) {

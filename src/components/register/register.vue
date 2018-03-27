@@ -188,7 +188,9 @@ export default {
         return
       }
       this.closeModal()
-      this.$store.dispatch('createTimeline', this.newTimelineTitle)
+      this.$store.dispatch('createTimeline', this.newTimelineTitle).then(item => {
+        this.openTimeline(item)
+      })
     },
     deleteTimeline: function() {
       this.closeModal()
