@@ -60,7 +60,6 @@
 <script>
 import {formatDate, validTitle} from '../../scripts/script'
 import aEvents from './events'
-import {guid} from '../../scripts/script'
 
 export default {
   name: 'aTimeline',
@@ -97,7 +96,7 @@ export default {
       return formatDate(this.timeline.date)
     },
     events() {
-      return this.timeline.timelineEvents
+      return this.timeline.timelineEvents || []
     },
     eventOptions() {
       var options = [
@@ -185,19 +184,17 @@ export default {
       this.closeModal()
       var payload = {
         title: this.newEventTitle,
-        description: this.newEventDescription,
-        id: guid()
+        description: this.newEventDescription
       }
 
       if (!this.exactDateTime) {
         payload.beforeAfter = this.beforeAfterSelect
         payload.eventId = this.eventSelect
-        payload.type ='BA'
+        this.$store.dispatch('createEventBA', payload)
       } else {
         payload.dateTime = this.newEventDateTime
-        payload.type = 'exact'
+        this.$store.dispatch('createEventExact', payload)
       }
-      this.$store.dispatch('createEvent', payload)
     },
     /* Called when a key is pressed on the create modal input. */
     checkTitleInput: function() {
@@ -240,7 +237,7 @@ export default {
     }
   }
   .footer {
-    position: absolute;
+    position: fixed;
     bottom: 0;
     padding: 20px;
   }

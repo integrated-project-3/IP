@@ -4,53 +4,18 @@ import BootstrapVue from 'bootstrap-vue'
 import VueRouter from 'vue-router'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
-import axios from 'axios'
 import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
 import router from './router'
-// import store from './store'
-// import VueMaterial from 'vue-material'
-// import 'vue-material/dist/vue-material.min.css'
-import {guid} from './scripts/script'
+import {getAll, createTimeline, deleteTimeline, changeTimelineTitle, createEvent, linkEventToTimeline, unlinkEventFromEvent, linkEventToEvent} from './scripts/api'
 
 Vue.use(BootstrapVue)
 Vue.use(VueRouter)
 Vue.use(Vuex)
-// Vue.use(VueMaterial)
 
 Vue.config.productionTip = false
 
 var timelines = []
-
-function fetchTimelines() {
-  timelines.splice(0, timelines.length)
-  axios.get('https://gcu.ideagen-development.com/Timeline/GetAllTimelinesAndEvent', {
-    headers: {
-      'TenantId': 'Team19',
-      'AuthToken': '7cbc5c61-bcfa-47d8-a171-599616102147'
-    }
-  })
-  .then((data) => {
-    for (var i = 0; i < data.data.Timelines.length; i++) {
-      var item = data.data.Timelines[i]
-      var timeline = {
-         title: item.Title,
-         date: item.CreationTimeStamp,
-         isDeleted: item.isDeleted,
-         id: item.Id,
-         timelineEvents: item.TimelineEvents,
-         selected: false,
-         _rowVariant: ''
-      }
-      timelines.push(timeline)
-    }
-  })
-  .catch(error => {
-    console.log(error)
-  })
-}
-
-fetchTimelines()
 
 const store = new Vuex.Store({
   state: {
@@ -62,10 +27,7 @@ const store = new Vuex.Store({
       state.timelines.push(timeline)
     },
     addEvent(state, event) {
-      state.timelines[state.timelines.indexOf(state.currentTimeline)].timelineEvents.push(event)
-      // state.currentTimeline.timelineEvents.push(event)
-      // console.log(state.currentTimeline)
-      // console.log(event)
+      state.currentTimeline.timelineEvents.push(event)
     },
     removeTimeline(state, id) {
       for (var i = 0; i < state.timelines.length; i++) {
@@ -89,108 +51,99 @@ const store = new Vuex.Store({
   },
   actions: {
     createTimeline ({ commit }, title) {
-      axios.put('https://gcu.ideagen-development.com/Timeline/Create',
-        {
-          'AuthToken':'7cbc5c61-bcfa-47d8-a171-599616102147',
-          'TenantId':'Team19',
-          'Title': title,
-          'TimelineId': guid()
-        }
-      ).then(response => {
+      createTimeline(title).then(response => {
         var item = response.data
         var timeline = {
-          title: item.Title,
-          date: item.CreationTimeStamp,
-          isDeleted: item.isDeleted,
-          id: item.Id,
-          selected: false,
-          _rowVariant: ''
+           title: item.Title,
+           date: item.CreationTimeStamp,
+           isDeleted: item.IsDeleted,
+           id: item.Id,
+           selected: false,
+           _rowVariant: ''
         }
+        timeline.timelineEvents = []
         commit('addTimeline', timeline)
-      })
-      .catch(error => {
-        console.log(error)
       })
     },
     deleteTimeline({ commit }, id) {
-      axios.put('https://gcu.ideagen-development.com/Timeline/Delete',
-        {
-          'AuthToken':'7cbc5c61-bcfa-47d8-a171-599616102147',
-          'TenantId':'Team19',
-          'TimelineId':id
-        }
-      ).then(() => {
+      deleteTimeline(id).then(() => {
         commit('removeTimeline', id)
-      })
-      .catch(error => {
-        console.log(error)
       })
     },
     deleteSelectedTimelines({ state }) {
-      for (var i = state.timelines.length-1; i >= 0; i--) {
-        var timeline = state.timelines[i]
-        if (timeline.selected === true) {
-          this.dispatch('deleteTimeline', timeline.id)
-        }
-      }
+      /*
+        Filter returns an array of all selected timelines.
+        Foreach loops through that returned array,
+        using 'e' as the current timline.
+        Dispatch calls deleteTimeline action.
+        This at the end allows the use of this inside the forEach function.
+      */
+      state.timelines.filter(t => t.selected).forEach(function(e){this.dispatch('deleteTimeline',e.id)}, this)
     },
     changeTimelineTitle({ commit }, title) {
       var id = this.getters.selectedTimelines[0].id
-      axios.put('https://gcu.ideagen-development.com/Timeline/EditTitle',
-        {
-          'AuthToken':'7cbc5c61-bcfa-47d8-a171-599616102147',
-          'TenantId':'Team19',
-          'Title': title,
-          'TimelineId': id
-        }
-      ).then(() => {
+      changeTimelineTitle(id, title).then(() => {
         commit('updateTimelineTitle', {id, title})
       })
-      .catch(error => {
-        console.log(error)
-      })
     },
-    createEvent ({state, commit}, payload) {
-      var dateTime = ''
+    createEventExact ({state, commit}, payload) {
       var newEvent = {}
-      if (payload.type === 'exact') {
-        dateTime = payload.dateTime
-      } else if(payload.type === 'BA') {
-
-      }
-      axios.put('https://gcu.ideagen-development.com/TimelineEvent/Create',
-        {
-        'AuthToken':'7cbc5c61-bcfa-47d8-a171-599616102147',
-        'TenantId':'Team19',
-        'TimelineEventId': payload.id,
-        'Title': payload.title,
-        'Description': payload.description,
-        'EventDateTime': dateTime
-        }
-      ).then(response => {
+      createEvent(payload).then(response => {
         newEvent = response.data
-        axios.put('https://gcu.ideagen-development.com/Timeline/LinkEvent',
-          {
-            'AuthToken':'7cbc5c61-bcfa-47d8-a171-599616102147',
-            'TenantId':'Team19',
-            'TimelineId': state.currentTimeline.id,
-            'EventId': payload.id
-          }
-        ).then(() => {
+        newEvent.LinkedTimelineEventIds = []
+        linkEventToTimeline(newEvent.Id, state.currentTimeline.id).then(() => {
           commit('addEvent', newEvent)
         })
-        .catch(error => {
-          console.log(error)
-        })
       })
-      .catch(error => {
-        console.log(error)
+    },
+    createEventBA({state, commit}, payload) {
+      var newEvent = {}
+      createEvent(payload).then(response => {
+        newEvent = response.data
+        linkEventToTimeline(newEvent.Id, state.currentTimeline.id).then(() => {
+          if (payload.beforeAfter === 'before') {
+            /*
+              Create a new timeline, create Event 1 at 12:00.
+              Create Event 2 set as before Event 1.
+              Now if you create Event 3 and also set this as before Event 1,
+              this will find that Event 2 already has a link to Event 1.
+              Replaces Event 2's link to Event 1 with a link to Event 3.
+              Links Event 3 to Event 1.
+              index would be the index of Event 2 in that example
+            */
+            let index = state.currentTimeline.timelineEvents.map(function(e) {if(e.LinkedTimelineEventIds != null)if(e.LinkedTimelineEventIds[0] != null)return e.LinkedTimelineEventIds[0]}).indexOf(payload.eventId)
+            if (index != -1) {
+              unlinkEventFromEvent(state.currentTimeline.timelineEvents[index].Id, payload.eventId)
+              linkEventToEvent(state.currentTimeline.timelineEvents[index].Id, newEvent.Id)
+              state.currentTimeline.timelineEvents[index].LinkedTimelineEventIds[0] = newEvent.Id
+            }
+            linkEventToEvent(newEvent.Id, payload.eventId).then(() => {
+              newEvent.LinkedTimelineEventIds = []
+              newEvent.LinkedTimelineEventIds.push(payload.eventId)
+              commit('addEvent', newEvent)
+            })
+          } else if (payload.beforeAfter === 'after') {
+            let index = state.currentTimeline.timelineEvents.map(function(e) {return e.Id}).indexOf(payload.eventId)
+            let item = state.currentTimeline.timelineEvents[index]
+            if (item.LinkedTimelineEventIds != null) {
+              if (item.LinkedTimelineEventIds[0] != null) {
+                unlinkEventFromEvent(item.Id, item.LinkedTimelineEventIds[0])
+                linkEventToEvent(newEvent.Id, item.Id)
+              }
+            }
+            linkEventToEvent(item.Id, newEvent.Id).then(() => {
+              item.LinkedTimelineEventIds = []
+              item.LinkedTimelineEventIds.push(newEvent.Id)
+              commit('addEvent', newEvent)
+            })
+          }
+        })
       })
     }
   },
   getters: {
     selectedTimelines: (state) => {
-      return state.timelines.filter(timeline => timeline.selected)
+      return state.timelines.filter(t => t.selected)
     }
   },
   plugins: [createPersistedState({
@@ -201,5 +154,29 @@ const store = new Vuex.Store({
 new Vue({
   render: h => h(app),
   router,
-  store
+  store,
+  methods: {
+    fetchTimelines() {
+      timelines.splice(0, timelines.length)
+      var get = getAll()
+      get.then((data) => {
+        for (var i = 0; i < data.data.Timelines.length; i++) {
+          var item = data.data.Timelines[i]
+          var timeline = {
+             title: item.Title,
+             date: item.CreationTimeStamp,
+             isDeleted: item.isDeleted,
+             id: item.Id,
+             timelineEvents: item.TimelineEvents,
+             selected: false,
+             _rowVariant: ''
+          }
+          timelines.push(timeline)
+        }
+      })
+    }
+  },
+  mounted() {
+    this.fetchTimelines()
+  }
 }).$mount('#app')

@@ -6,11 +6,21 @@ function formatDate(ticks) {
   return date.toLocaleDateString()
 }
 
-function formatAttachmentTime(dateTime) {
+function formatEventTime(dateTime) {
   if (dateTime.length === 16) {
     return dateTime.substring(11,17)
   }
   return "Time not available"
+}
+
+function formatEventDate(dateTime) {
+  if (dateTime.length === 16) {
+    var day = dateTime.substr(8,2)
+    var month = dateTime.substr(5,2)
+    var year = dateTime.substr(0,4)
+    return day + '/' + month + '/' + year
+  }
+  return "Date not available"
 }
 
 function validTitle(str) {
@@ -21,16 +31,31 @@ function validTitle(str) {
   return false
 }
 
-
-function guid() {
-  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-  s4() + '-' + s4() + s4() + s4();
+Array.prototype.diff = function(a) {
+  return this.filter(function(i) {return a.indexOf(i) < 0})
 }
 
-function s4() {
-  return Math.floor((1 + Math.random()) * 0x10000)
-  .toString(16)
-  .substring(1);
+function sortEvents(events) {
+
+  // seperate events into 2 lists, one for events with times, one for the rest.
+  // need this for sorting by time.
+  var eventsWithTime = events.filter(event => event.EventDateTime != 'n/a')
+  var eventsWithoutTime = events.diff(eventsWithTime)
+  // events = []
+
+  var sortedEvents = eventsWithTime.sort(function(a,b) {
+    a = new Date(a.EventDateTime)
+    b = new Date(b.EventDateTime)
+    return a - b
+  })
+
+  for (var i = 0; i < eventsWithoutTime.length; i++) {
+    var index = sortedEvents.map(function(e) {if (e.LinkedTimelineEventIds != null)return e.LinkedTimelineEventIds[0]}).indexOf(eventsWithoutTime[i].Id) +1
+    if (index === 0) index = sortedEvents.map(function(e) {return e.Id}).indexOf(eventsWithoutTime[i].LinkedTimelineEventIds[0])
+    sortedEvents.splice(index, 0, eventsWithoutTime[i])
+  }
+
+  return sortedEvents
 }
 
-export {formatDate, formatAttachmentTime, validTitle, guid}
+export {formatDate, formatEventTime, formatEventDate, validTitle, sortEvents}

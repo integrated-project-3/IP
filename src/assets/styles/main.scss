@@ -57,7 +57,7 @@ body, #app {
 /*
   Buttons
 */
-button:not(.md-button) {
+button:not(.md-button, .btn-round) {
   border: none;
   border-radius: 2px;
   min-width: 94px;

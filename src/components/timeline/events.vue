@@ -3,7 +3,7 @@
     <div id="slider" :style="{width: sliderWidth}">
       <div class="event" v-for="(e, index) in eventsInOrder" :key="e.id">
         <div class="time" v-if="index === 0 || index === events.length-1">
-          <p>{{formatAttachmentTime(e.EventDateTime)}}</p>
+          <p>{{formatEventTime(e.EventDateTime)}}</p>
         </div>
         <div class="title" :id="e.Id" @click="clickedTitle($event)">
           <p>{{e.Title}}</p>
@@ -15,7 +15,7 @@
       <div class="info" id="event-info">
         <div v-if="selectedEvent.Id != ''" >
           <h2>{{selectedTitle}}<i class="material-icons icon" style="padding-left: 5px;">edit</i></h2>
-          <h4>{{selectedTime}}</h4>
+          <h4>{{selectedTime}} - {{selectedDate}}</h4>
           <p>
             {{selectedDescription}}
           </p>
@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import {formatAttachmentTime} from '../../scripts/script'
+import {formatEventTime, formatEventDate, sortEvents} from '../../scripts/script'
 
 var drag = false
 var lastPos = []
@@ -40,7 +40,8 @@ export default {
   name: 'aEvents',
   data() {
     return {
-      formatAttachmentTime,
+      formatEventTime,
+      formatEventDate,
       scale,
       selectedEvent: {
         'Id': '',
@@ -75,7 +76,7 @@ export default {
       return 375 * this.events.length + "px"
     },
     eventsInOrder() {
-      return this.events
+      return sortEvents(this.events)
     },
     selectedTitle() {
       if (this.selectedEvent.Title != null)
@@ -84,7 +85,12 @@ export default {
     },
     selectedTime() {
       if (this.selectedEvent.EventDateTime != null)
-        return formatAttachmentTime(this.selectedEvent.EventDateTime)
+        return formatEventTime(this.selectedEvent.EventDateTime)
+      return ""
+    },
+    selectedDate() {
+      if (this.selectedEvent.EventDateTime != null)
+        return formatEventDate(this.selectedEvent.EventDateTime)
       return ""
     },
     selectedDescription() {
@@ -156,6 +162,12 @@ export default {
     },
     deleteEvent: function() {
 
+    },
+    dateFromDateTime(dateTime) {
+      return dateTime.substr(0,10)
+    },
+    timeFromDateTime(dateTime) {
+      return dateTime.substr(11,16)
     }
   }
 }
@@ -169,9 +181,9 @@ export default {
   overflow: hidden;
   height: 500px;
   cursor: pointer;
-  width: 100vw;
+  width: 100%;
   height: 500px;
-  box-shadow: 0 0 5px 5px rgba(0, 0, 0, .1);
+  // box-shadow: 0 0 5px 5px rgba(0, 0, 0, .1);
   padding-top: 10px;
   #slider {
     position: relative;
