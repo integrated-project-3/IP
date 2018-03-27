@@ -86,8 +86,6 @@ function deselectRow(item) {
   item._rowVariant = ''
 }
 
-
-
 export default {
   name: 'aRegister',
   components: {

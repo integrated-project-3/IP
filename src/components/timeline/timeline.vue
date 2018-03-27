@@ -19,7 +19,7 @@
       </b-row>
       <b-row align-v="end" class="footer">
         <b-col md="12">
-          <b-btn variant="delete" @click="deleteTimeline">Delete</b-btn>
+          <b-btn variant="delete" @click="openModal('deleteTimeline')">Delete</b-btn>
         </b-col>
       </b-row>
     </div>
@@ -48,10 +48,18 @@
             </b-row>
           </b-col>
         </b-row>
+        <b-row v-else-if="modalType === 'deleteTimeline'">
+          <b-col>
+            <p>
+              Are you sure you wish to delete this timeline?
+            </p>
+          </b-col>
+        </b-row>
       </b-container>
       <div slot="modal-footer" class="w-100">
         <b-btn class="float-left" @click="closeModal">CANCEL</b-btn>
         <b-btn v-if="modalType === 'createEvent'" class="float-right" @click="createEvent">CREATE</b-btn>
+        <b-btn v-else-if="modalType === 'deleteTimeline'" class="float-right" @click="deleteTimeline">DELETE</b-btn>
       </div>
     </b-modal>
   </div>
@@ -126,7 +134,9 @@ export default {
       return dateTime.substring(11, 16)
     },
     deleteTimeline() {
-
+      this.closeModal()
+      this.$store.dispatch('deleteTimeline', this.timeline.id)
+      this.$router.push({name: 'REGISTER'})
     },
     openModal(type) {
       this.modal = true
@@ -139,6 +149,8 @@ export default {
       if (this.modalType === "createEvent") {
         document.getElementById('titleInput').focus()
         this.modalTitle = "Create"
+      } else if (this.modalType === "deleteTimeline") {
+        this.modalTitle = "Delete"
       }
     },
     modalClosed() {
