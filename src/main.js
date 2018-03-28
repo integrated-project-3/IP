@@ -51,7 +51,7 @@ const store = new Vuex.Store({
   },
   actions: {
     createTimeline ({ commit }, title) {
-      return new Promise ((resolve, reject) => {
+      return new Promise ((resolve) => {
         createTimeline(title).then(response => {
           var item = response.data
           var timeline = {
@@ -130,8 +130,10 @@ const store = new Vuex.Store({
             let item = state.currentTimeline.timelineEvents[index]
             if (item.LinkedTimelineEventIds != null) {
               if (item.LinkedTimelineEventIds[0] != null) {
+                linkEventToEvent(newEvent.Id, item.LinkedTimelineEventIds[0])
                 unlinkEventFromEvent(item.Id, item.LinkedTimelineEventIds[0])
-                linkEventToEvent(newEvent.Id, item.Id)
+                newEvent.LinkedTimelineEventIds = []
+                newEvent.LinkedTimelineEventIds.push(item.LinkedTimelineEventIds[0])
               }
             }
             linkEventToEvent(item.Id, newEvent.Id).then(() => {

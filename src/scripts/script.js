@@ -49,12 +49,73 @@ function sortEvents(events) {
     return a - b
   })
 
-  for (var i = 0; i < eventsWithoutTime.length; i++) {
-    var index = sortedEvents.map(function(e) {if (e.LinkedTimelineEventIds != null)return e.LinkedTimelineEventIds[0]}).indexOf(eventsWithoutTime[i].Id) +1
-    if (index === 0) index = sortedEvents.map(function(e) {return e.Id}).indexOf(eventsWithoutTime[i].LinkedTimelineEventIds[0])
-    sortedEvents.splice(index, 0, eventsWithoutTime[i])
-  }
+  // for (var i = 0; i < eventsWithoutTime.length; i++) {
+  //   var index = sortedEvents.map(function(e) {if (e.LinkedTimelineEventIds != null) if(e.LinkedTimelineEventIds[0] != null) return e.LinkedTimelineEventIds[0]}).indexOf(eventsWithoutTime[i].Id) +1
+  //   if (index === 0) index = sortedEvents.map(function(e) {return e.Id}).indexOf(eventsWithoutTime[i].LinkedTimelineEventIds[0])
+  //   sortedEvents.splice(index, 0, eventsWithoutTime[i])
+  // }
 
+  // for (var i = 0; i < eventsWithoutTime.length; i++) {
+  //   var index = sortedEvents.map(function(e) {if (e.LinkedTimelineEventIds != null) if(e.LinkedTimelineEventIds[0] != null) return e.LinkedTimelineEventIds[0]}).indexOf(eventsWithoutTime[i].Id) +1
+  //   if (index === 0) {
+  //     if (eventsWithoutTime[i].LinkedTimelineEventIds != null) {
+  //       if (eventsWithoutTime[i].LinkedTimelineEventIds[0] != null) {
+  //         index = sortedEvents.map(function(e) {return e.Id}).indexOf(eventsWithoutTime[i].LinkedTimelineEventIds[0])
+  //       } else {
+  //         break
+  //       }
+  //     } else {
+  //       break
+  //     }
+  //   }
+  //   // if (index != -1)
+  //     sortedEvents.splice(index, 0, eventsWithoutTime[i])
+  // }
+
+  // var i = 0
+  // while (eventsWithoutTime.length > 0) {
+  //   console.log("1: " + i)
+  //   console.log("1: " + eventsWithoutTime)
+  //   for (var j = 0; j < sortedEvents.length; j++) {
+  //     var index = sortedEvents.map(function(e) {if (e.LinkedTimelineEventIds != null) if(e.LinkedTimelineEventIds[0] != null) return e.LinkedTimelineEventIds[0]}).indexOf(eventsWithoutTime[i].Id) +1
+  //     if (index === 0) {
+  //       if (eventsWithoutTime[i].LinkedTimelineEventIds != null) {
+  //         if (eventsWithoutTime[i].LinkedTimelineEventIds[0] != null) {
+  //           index = sortedEvents.map(function(e) {return e.Id}).indexOf(eventsWithoutTime[i].LinkedTimelineEventIds[0])
+  //         }
+  //       }
+  //     }
+  //     if (index != -1) {
+  //       sortedEvents.splice(index, 0, eventsWithoutTime.splice(i,1))
+  //       break
+  //     }
+  //   }
+  //   // i += 1
+  //   console.log("2: " + i)
+  //   console.log("2: " + eventsWithoutTime)
+  //   // if (i === eventsWithoutTime.length) i = 0
+  // }
+  while (eventsWithoutTime.length != 0) {
+    for (var i = eventsWithoutTime.length-1; i >= 0; i--) {
+      var index = sortedEvents.map(function(e) {if (e.LinkedTimelineEventIds != null) if(e.LinkedTimelineEventIds[0] != null) return e.LinkedTimelineEventIds[0]}).indexOf(eventsWithoutTime[i].Id) +1
+      if (index === 0) {
+        if (eventsWithoutTime[i].LinkedTimelineEventIds != null) {
+          if (eventsWithoutTime[i].LinkedTimelineEventIds[0] != null) {
+            index = sortedEvents.map(function(e) {return e.Id}).indexOf(eventsWithoutTime[i].LinkedTimelineEventIds[0])
+          } else {
+            index = -1
+          }
+        } else {
+          index = -1
+        }
+      }
+      if (index != -1) {
+        var ev = eventsWithoutTime.splice(i,1)[0]
+        sortedEvents.splice(index, 0, ev)
+      }
+    }
+  }
+  
   return sortedEvents
 }
 
