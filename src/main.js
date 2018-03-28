@@ -33,12 +33,18 @@ const store = new Vuex.Store({
       for (var i = 0; i < state.timelines.length; i++) {
         if (state.timelines[i].id === id) {
           state.timelines.splice(i,1)
+          if (state.currentTimeline != null)
+            if (state.currentTimeline.id === id)
+              state.currentTimeline = null
           return
         }
       }
     },
     setCurrentTimeline(state, timeline) {
       state.currentTimeline = timeline
+    },
+    clearCurrentTimeline(state) {
+      state.currentTimeline = null
     },
     updateTimelineTitle(state, payload) {
       for (var i = 0; i < state.timelines.length; i++) {

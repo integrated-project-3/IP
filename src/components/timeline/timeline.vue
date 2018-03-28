@@ -1,67 +1,74 @@
 <template >
   <div>
-    <div class="timeline">
-      <b-row class="head" align-v="start">
-        <b-col md="2">
-          <b-btn variant="select" @click="back">Back</b-btn>
-        </b-col>
-        <b-col>
-          <span class="timeline-details">
-            <h1>{{title}} - {{date}}</h1>
-          </span>
-        </b-col>
-        <b-col md="2">
-          <b-btn variant="create" @click="openModal('createEvent')" style="float: right;">Create new event</b-btn>
-        </b-col>
-      </b-row>
-      <b-row align-v="center" class="events">
-        <a-events :events="events"></a-events>
-      </b-row>
-      <b-row align-v="end" class="footer">
-        <b-col md="12">
-          <b-btn variant="delete" @click="openModal('deleteTimeline')">Delete</b-btn>
-        </b-col>
-      </b-row>
-    </div>
-    <b-modal  v-model="modal" :title="modalTitle" @shown="modalOpened" @hidden="modalClosed" size="lg">
-      <b-container fluid>
-        <b-row v-if="modalType === 'createEvent'">
-          <b-col md="6">
-            <b-row>
-              <input type="text" v-model="newEventTitle" @keyup.enter="createEvent" @keyup="checkTitleInput" placeholder="Enter title" id="titleInput"/>
-              <b-alert variant="danger" :show="showTitleWarning">Title must be at least 5 characters long</b-alert>
-            </b-row>
-            <b-row>
-              <b-form-textarea id="textarea1" v-model="newEventDescription" placeholder="Enter description" :rows="3" :max-rows="8"/>
-            </b-row>
+    <div v-if="timeline != null">
+      <div class="timeline">
+        <b-row class="head" align-v="start">
+          <b-col md="2">
+            <b-btn variant="select" @click="back">Back</b-btn>
           </b-col>
-          <b-col md="6">
-            <b-row id="checkBoxCol">
-              <b-form-checkbox id="exactDateTime" v-model="exactDateTime">Exact date and time</b-form-checkbox>
-            </b-row>
-            <b-row v-if="!exactDateTime">
-              <b-form-select v-model="beforeAfterSelect" :options="beforeAfterOptions" class="mb-3" id="beforeAfterSelect" @change="checkInput('beforeAfterSelect')"/>
-              <b-form-select v-model="eventSelect" :options="eventOptions" class="mb-3" id="eventSelect" @change="checkInput('eventSelect')"/>
-            </b-row>
-            <b-row v-if="exactDateTime">
-              <input type="datetime-local" v-model="newEventDateTime" id="newEventDateTime" @change="checkInput('newEventDateTime')"/>
-            </b-row>
-          </b-col>
-        </b-row>
-        <b-row v-else-if="modalType === 'deleteTimeline'">
           <b-col>
-            <p>
-              Are you sure you wish to delete this timeline?
-            </p>
+            <span class="timeline-details">
+              <h1>{{title}} - {{date}}</h1>
+            </span>
+          </b-col>
+          <b-col md="2">
+            <b-btn variant="create" @click="openModal('createEvent')" style="float: right;">Create new event</b-btn>
           </b-col>
         </b-row>
-      </b-container>
-      <div slot="modal-footer" class="w-100">
-        <b-btn class="float-left" @click="closeModal">CANCEL</b-btn>
-        <b-btn v-if="modalType === 'createEvent'" class="float-right" @click="createEvent">CREATE</b-btn>
-        <b-btn v-else-if="modalType === 'deleteTimeline'" class="float-right" @click="deleteTimeline">DELETE</b-btn>
+        <b-row align-v="center" class="events">
+          <a-events :events="events"></a-events>
+        </b-row>
+        <b-row align-v="end" class="footer">
+          <b-col md="12">
+            <b-btn variant="delete" @click="openModal('deleteTimeline')">Delete</b-btn>
+          </b-col>
+        </b-row>
       </div>
-    </b-modal>
+      <b-modal  v-model="modal" :title="modalTitle" @shown="modalOpened" @hidden="modalClosed" size="lg">
+        <b-container fluid>
+          <b-row v-if="modalType === 'createEvent'">
+            <b-col md="6">
+              <b-row>
+                <input type="text" v-model="newEventTitle" @keyup.enter="createEvent" @keyup="checkTitleInput" placeholder="Enter title" id="titleInput"/>
+                <b-alert variant="danger" :show="showTitleWarning">Title must be at least 5 characters long</b-alert>
+              </b-row>
+              <b-row>
+                <b-form-textarea id="textarea1" v-model="newEventDescription" placeholder="Enter description" :rows="3" :max-rows="8"/>
+              </b-row>
+            </b-col>
+            <b-col md="6">
+              <b-row id="checkBoxCol">
+                <b-form-checkbox id="exactDateTime" v-model="exactDateTime">Exact date and time</b-form-checkbox>
+              </b-row>
+              <b-row v-if="!exactDateTime">
+                <b-form-select v-model="beforeAfterSelect" :options="beforeAfterOptions" class="mb-3" id="beforeAfterSelect" @change="checkInput('beforeAfterSelect')"/>
+                <b-form-select v-model="eventSelect" :options="eventOptions" class="mb-3" id="eventSelect" @change="checkInput('eventSelect')"/>
+              </b-row>
+              <b-row v-if="exactDateTime">
+                <input type="datetime-local" v-model="newEventDateTime" id="newEventDateTime" @change="checkInput('newEventDateTime')"/>
+              </b-row>
+            </b-col>
+          </b-row>
+          <b-row v-else-if="modalType === 'deleteTimeline'">
+            <b-col>
+              <p>
+                Are you sure you wish to delete this timeline?
+              </p>
+            </b-col>
+          </b-row>
+        </b-container>
+        <div slot="modal-footer" class="w-100">
+          <b-btn class="float-left" @click="closeModal">CANCEL</b-btn>
+          <b-btn v-if="modalType === 'createEvent'" class="float-right" @click="createEvent">CREATE</b-btn>
+          <b-btn v-else-if="modalType === 'deleteTimeline'" class="float-right" @click="deleteTimeline">DELETE</b-btn>
+        </div>
+      </b-modal>
+    </div>
+    <div v-else>
+      <h2>
+        No timeline selected. Click <router-link to="/">here</router-link> to return to timeline register.
+      </h2>
+    </div>
   </div>
 </template>
 
@@ -136,7 +143,8 @@ export default {
     deleteTimeline() {
       this.closeModal()
       this.$store.dispatch('deleteTimeline', this.timeline.id)
-      this.$router.push({name: 'REGISTER'})
+      // this.$store.commit('clearCurrentTimeline')
+      this.back()
     },
     openModal(type) {
       this.modal = true
