@@ -1,15 +1,9 @@
 <template lang="html">
   <div class="search">
     <span>
-      <!--
-        Displays a search icon which can trigger the search
-      -->
-      <i v-on:click="search" class="material-icons icon">search</i>
       <input type="text" v-model="searchValue" :placeholder="placeholder" @keyup.enter="search"/>
-      <!--
-        Display an arrow to expand the search
-      -->
-      <i class="material-icons arrow-down">arrow_drop_down</i>
+      <i v-if="searchValue.length > 0" @click="searchValue = ''" class="material-icons icon clear-icon">clear</i>
+      <i @click="search" class="material-icons icon search-icon">search</i>
     </span>
   </div>
 </template>
@@ -23,10 +17,6 @@ export default {
     }
   },
   props: {
-    /*
-      Set the placeholder for the search.
-      Default: Search...
-    */
     placeholder: {
       type: String,
       required: false,
@@ -34,10 +24,6 @@ export default {
     }
   },
   methods: {
-    /*
-      Called when the user searches.
-      Emits a searched function with the searchValue for a parent component to use.
-    */
     search: function() {
       this.$emit("searched", this.searchValue)
     }
@@ -48,29 +34,31 @@ export default {
 <style lang="scss" scoped>
 @import '../../assets/styles/theme.scss';
 
+.search {
+  width: 100%;
+}
 i {
   position: absolute;
 }
 .icon {
   top: 50%;
   transform: translateY(-50%);
-  font-size: 3em;
+  &.search-icon {
+    font-size: 3em;
+  }
+  &.clear-icon {
+    right: 7%;
+  }
 }
 input {
   background-color: $search-bg;
   border-radius: 2px;
   border-width: 0;
-  width: 100%;
-  font-size: 3em;
-  padding-left: 65px;
+  width: 95%;
+  font-size: 2em;
+  padding-left: 15px;
   &:focus {
     outline: none;
   }
-}
-.arrow-down {
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 5em;
-  right: 10px;
 }
 </style>
