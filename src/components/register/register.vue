@@ -12,6 +12,7 @@
                   @row-clicked="rowClicked"
                   @sort-changed="sortChanged"
                   @row-dblclicked="openTimeline"
+                  fixed
                   >
         </b-table>
       </b-col>
@@ -234,6 +235,7 @@ export default {
       } else if (this.modalType === "editTitle") {
         document.getElementById('titleInput').focus()
         this.modalTitle = "Edit"
+        this.newTimelineTitle = this.$store.getters.selectedTimelines[0].title
       }
     },
     modalClosed: function() {
@@ -258,6 +260,7 @@ export default {
   table {
     background-color: $register-bg;
     color: $text;
+    width: 100%;
     th {
       background-color: $background;
       border: none;
@@ -270,6 +273,7 @@ export default {
     td {
       border: none;
       font-size: 1.5em;
+      overflow: hidden;
     }
     .table-select {
       background-color: $select;

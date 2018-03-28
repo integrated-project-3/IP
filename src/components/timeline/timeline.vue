@@ -3,25 +3,22 @@
     <div v-if="timeline != null">
       <div class="timeline">
         <b-row class="head" align-v="start">
-          <b-col md="2">
+          <b-col md="2" class="buttons" id="back">
             <b-btn variant="select" @click="back">Back</b-btn>
           </b-col>
-          <b-col>
-            <span class="timeline-details">
-              <h1>{{title}} - {{date}}</h1>
-            </span>
-          </b-col>
-          <b-col md="2">
+          <b-col md="2" class="buttons" id="create">
             <b-btn variant="create" @click="openModal('createEvent')" style="float: right;">Create new event</b-btn>
+          </b-col>
+          <b-col md="2" class="buttons" id="delete">
+            <b-btn variant="delete" @click="openModal('deleteTimeline')">Delete</b-btn>
+          </b-col>
+          <b-col class="timeline-details">
+            <h1>{{title}}</h1>
+            <h3>{{date}}</h3>
           </b-col>
         </b-row>
         <b-row align-v="center" class="events">
           <a-events :events="events"></a-events>
-        </b-row>
-        <b-row align-v="end" class="footer">
-          <b-col md="12">
-            <b-btn variant="delete" @click="openModal('deleteTimeline')">Delete</b-btn>
-          </b-col>
         </b-row>
       </div>
       <b-modal  v-model="modal" :title="modalTitle" @shown="modalOpened" @hidden="modalClosed" size="lg">
@@ -245,21 +242,37 @@ export default {
 
 .timeline {
   padding-top: 20px;
-  .timeline-details {
-    h1 {
-      @media only screen and (max-width: 576px) {
-        font-size: 2em;
-      }
-      font-size: 4em;
+  @media screen and (max-width: 720px) {
+    button {
+      width: 100%
     }
-    p {
-      font-size: 2em;
+    #create button, #delete button {
+      margin-top: 10px;
+    }
+    .timeline-details {
+      // word-wrap: break-word;
+      overflow: auto;
+      h1, h3 {
+        font-size: 10vw;
+      }
     }
   }
-  .footer {
-    position: fixed;
-    bottom: 0;
-    padding: 20px;
+  @media screen and (min-width: 720px) {
+    #create {
+      right: 0;
+      position: absolute;
+    }
+    #delete {
+      bottom: 0;
+      position: absolute;
+      padding: 15px;
+    }
+    .timeline-details {
+      overflow: hidden;
+      h1, h3 {
+        font-size: 3vw;
+      }
+    }
   }
 }
 .md-datepicker-dialog {
