@@ -204,7 +204,11 @@ export default {
         return
       }
       this.closeModal()
-      this.$store.dispatch('changeTimelineTitle', this.newTimelineTitle)
+      var payload = {
+        id: this.$store.getters.selectedTimelines[0].id,
+        title: this.newTimelineTitle
+      }
+      this.$store.dispatch('changeTimelineTitle', payload)
     },
     /* Called when a key is pressed on the create modal input. */
     checkTitleInput: function() {

@@ -20,7 +20,8 @@ var timelines = []
 const store = new Vuex.Store({
   state: {
     timelines,
-    currentTimeline: null
+    currentTimeline: null,
+    currentEvent: null
   },
   mutations: {
     addTimeline (state, timeline) {
@@ -46,10 +47,19 @@ const store = new Vuex.Store({
     clearCurrentTimeline(state) {
       state.currentTimeline = null
     },
+    setCurentEvent(state, event) {
+      state.currentEvent = event
+    },
+    clearCurrentEvent(state) {
+      state.currentEvent = null
+    },
     updateTimelineTitle(state, payload) {
       for (var i = 0; i < state.timelines.length; i++) {
         if (state.timelines[i].id === payload.id) {
           state.timelines[i].title = payload.title
+          if(payload.id === state.currentTimeline.id) {
+            state.currentTimeline.title = payload.title
+          }
           return
         }
       }
@@ -89,8 +99,9 @@ const store = new Vuex.Store({
       */
       state.timelines.filter(t => t.selected).forEach(function(e){this.dispatch('deleteTimeline',e.id)}, this)
     },
-    changeTimelineTitle({ commit }, title) {
-      var id = this.getters.selectedTimelines[0].id
+    changeTimelineTitle({ state, commit }, payload) {
+      var id = payload.id
+      var title = payload.title
       changeTimelineTitle(id, title).then(() => {
         commit('updateTimelineTitle', {id, title})
       })

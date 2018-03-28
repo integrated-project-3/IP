@@ -12,13 +12,13 @@
           <b-col md="2" class="buttons" id="delete">
             <b-btn variant="delete" @click="openModal('deleteTimeline')">Delete</b-btn>
           </b-col>
-          <b-col class="timeline-details">
-            <h1>{{title}}</h1>
+          <b-col md="6" class="timeline-details">
+            <h1>{{title}}<i v-on:click="openModal('editTimelineTitle')" class="material-icons icon">edit</i></h1>
             <h3>{{date}}</h3>
           </b-col>
         </b-row>
         <b-row align-v="center" class="events">
-          <a-events :events="events"></a-events>
+          <a-events ref="events" :events="events"></a-events>
         </b-row>
       </div>
       <b-modal  v-model="modal" :title="modalTitle" @shown="modalOpened" @hidden="modalClosed" size="lg">
@@ -53,11 +53,18 @@
               </p>
             </b-col>
           </b-row>
+          <b-row v-else-if="modalType === 'editTimelineTitle'">
+            <b-col>
+              <input type="text" v-model="newTimelineTitle" @keyup.enter="changeTimelineTitle" @keyup="checkTitleInput" placeholder="Enter new title" id="titleInput" />
+              <b-alert variant="danger" :show="showTitleWarning">Title must be at least 5 characters long</b-alert>
+            </b-col>
+          </b-row>
         </b-container>
         <div slot="modal-footer" class="w-100">
           <b-btn class="float-left" @click="closeModal">CANCEL</b-btn>
           <b-btn v-if="modalType === 'createEvent'" class="float-right" @click="createEvent">CREATE</b-btn>
           <b-btn v-else-if="modalType === 'deleteTimeline'" class="float-right" @click="deleteTimeline">DELETE</b-btn>
+          <b-btn v-else-if="modalType === 'editTimelineTitle'" class="float-right" @click="changeTimelineTitle">SAVE</b-btn>
         </div>
       </b-modal>
     </div>
@@ -91,7 +98,8 @@ export default {
         { value: 'after', text: 'After'}
       ],
       eventSelect: null,
-      newEventDateTime: null
+      newEventDateTime: null,
+      newTimelineTitle: ''
     }
   },
   components: {
@@ -156,6 +164,10 @@ export default {
         this.modalTitle = "Create"
       } else if (this.modalType === "deleteTimeline") {
         this.modalTitle = "Delete"
+      } else if (this.modalType === "editTimelineTitle") {
+        document.getElementById('titleInput').focus()
+        this.modalTitle = "Edit"
+        this.newTimelineTitle = this.title
       }
     },
     modalClosed() {
@@ -167,6 +179,10 @@ export default {
         this.beforeAfterSelect = null
         this.eventSelect = null
         this.newEventDateTime = null
+        this.$refs.events.clearSelected()
+      } else if (this.modalType === "editTimelineTitle") {
+        this.newEventTitle = ''
+        this.showTitleWarning = false
       }
       this.modalType = ''
       this.modalTitle = ''
@@ -231,12 +247,25 @@ export default {
       if (el.style.border === "1px solid red") {
         el.style.border = ""
       }
+    },
+    changeTimelineTitle() {
+      if (!validTitle(this.newTimelineTitle)) {
+        document.getElementById('titleInput').focus()
+        this.showTitleWarning = true
+        return
+      }
+      this.closeModal()
+      var payload = {
+        id: this.timeline.id,
+        title: this.newTimelineTitle
+      }
+      this.$store.dispatch('changeTimelineTitle', payload)
     }
   }
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" >
 @import '../../assets/styles/theme.scss';
 @import '../../assets/styles/main.scss';
 
@@ -255,6 +284,9 @@ export default {
       h1, h3 {
         font-size: 10vw;
       }
+      i {
+        font-size: 8vw;
+      }
     }
   }
   @media screen and (min-width: 720px) {
@@ -271,6 +303,9 @@ export default {
       overflow: hidden;
       h1, h3 {
         font-size: 3vw;
+      }
+      i {
+        font-size: 2vw;
       }
     }
   }
