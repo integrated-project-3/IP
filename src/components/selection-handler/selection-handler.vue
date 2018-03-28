@@ -1,10 +1,12 @@
 <template lang="html">
   <b-row class="selection-handler" v-if="selectCount>0">
-    <b-col lg="8" offset-lg="2" md="10" offset-md="1">
+    <b-col lg="8" offset-lg="2" md="10" offset-md="1" class="main">
       <h2>{{ selectCount }} timeline<span v-if="this.selectCount>1">s</span> selected</h2>
-      <b-btn variant="delete" @click="del">Delete</b-btn>
-      <b-btn variant="cancel" @click="cancel">Cancel</b-btn>
-      <b-btn v-if="selectCount === 1" variant="info" @click="edit">Edit</b-btn>
+      <div class="buttons">
+        <b-btn v-if="selectCount === 1" variant="info" @click="edit">Edit</b-btn>
+        <b-btn variant="cancel" @click="cancel">Cancel</b-btn>
+        <b-btn variant="delete" @click="del">Delete</b-btn>
+      </div>
     </b-col>
   </b-row>
 </template>
@@ -37,7 +39,7 @@ export default {
 
 .selection-handler {
   text-align: center;
-  div {
+  div.main {
     position: fixed;
     background-color: $background;
     box-shadow: 0 -3px 6px rgba(0,0,0,0.16);
@@ -47,11 +49,28 @@ export default {
       display: inline;
       float: left;
     }
-    .btn-delete {margin-left: 20px}
-    .btn-cancel {margin-left: 20px}
-    button {
+    div.buttons {
       float: right;
-      border: none;
+      .btn-delete {margin-left: 20px}
+      .btn-cancel {margin-left: 20px}
+      button {
+        border: none;
+        width: 100px;
+      }
+    }
+    @media screen and (max-width: 670px) {
+      h2 {
+        display: block;
+        float: none;
+      }
+      div.buttons {
+        float: none;
+        .btn-delete {margin-left: 0;}
+        .btn-cancel {margin-left: 5px; margin-right: 5px;}
+        button {
+          margin-top: 10px;
+        }
+      }
     }
   }
 }
