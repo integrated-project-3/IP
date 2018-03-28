@@ -44,17 +44,17 @@ i {
   top: 50%;
   transform: translateY(-50%);
   &.search-icon {
-    font-size: 3em;
+    font-size: 2.2em;
   }
   &.clear-icon {
-    right: 7%;
+    right: 10%;
   }
 }
 input {
   background-color: $search-bg;
   border-radius: 2px;
   border-width: 0;
-  width: 95%;
+  width: 93%;
   font-size: 2em;
   padding-left: 15px;
   &:focus {
