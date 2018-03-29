@@ -44,6 +44,9 @@ export default {
 .selection-handler {
   text-align: center;
   div.main {
+    @media screen and (max-width: 720px) {
+      position: relative;
+    }
     position: fixed;
     background-color: $background;
     box-shadow: 0 -3px 6px rgba(0,0,0,0.16);

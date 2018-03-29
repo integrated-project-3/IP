@@ -3,7 +3,7 @@
     <b-row class="register" align-v="center" @click="clearSelected()">
       <b-col></b-col> <!-- used to center the table -->
       <b-col md="11">
-        <b-btn class="btn-round" variant="create" @click="openModal($event,'createTimeline')" style="float: right;">+</b-btn>
+        <b-btn class="btn-round" variant="create" @click="openModal('createTimeline')" style="float: right;">+</b-btn>
         <b-table :items="timelines"
                   bordered:false
                   :sort-by.sync="sort.by"
@@ -18,7 +18,7 @@
       </b-col>
       <b-col></b-col> <!-- used to center the table -->
     </b-row>
-    <a-selection-handler :select-count="selectCount" @del="openModal(null,'deleteTimeline')" @cancel="cancel" @edit="openModal(null,'editTitle')"></a-selection-handler>
+    <a-selection-handler :select-count="selectCount" @del="openModal('deleteTimeline')" @cancel="cancel" @edit="openModal('editTitle')"></a-selection-handler>
     <b-modal  v-model="modal" :title="modalTitle" @shown="modalOpened" @hidden="modalClosed">
       <b-container fluid>
         <b-row>
@@ -231,9 +231,7 @@ export default {
         }
       }
     },
-    openModal: function(event, type) {
-      if (event != null)
-        event.stopPropagation()
+    openModal: function(type) {
       this.modal = true
       this.modalType = type
     },
