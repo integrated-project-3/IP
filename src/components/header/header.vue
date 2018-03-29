@@ -1,5 +1,5 @@
 <template lang="html">
-  <b-row class="header" align-v="start">
+  <b-row class="header" align-v="start" @click="headerClicked()">
     <b-col md="6">
       <!-- Adds a logo which when clicked goes to the register. -->
       <a-logo />
@@ -28,6 +28,10 @@ export default {
     }
   },
   methods: {
+    headerClicked() {
+      // stops selected timelines from being cleared on register
+      event.stopPropagation()
+    },
     /* Called when the user searches. */
     search: function(searchValue) {
       console.log(searchValue)

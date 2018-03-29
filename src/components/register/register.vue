@@ -1,9 +1,9 @@
 <template lang="html">
   <div>
-    <b-row class="register" align-v="center">
+    <b-row class="register" align-v="center" @click="clearSelected()">
       <b-col></b-col> <!-- used to center the table -->
       <b-col md="11">
-        <b-btn class="btn-round" variant="create" @click="openModal('createTimeline')" style="float: right;">+</b-btn>
+        <b-btn class="btn-round" variant="create" @click="openModal($event,'createTimeline')" style="float: right;">+</b-btn>
         <b-table :items="timelines"
                   bordered:false
                   :sort-by.sync="sort.by"
@@ -18,7 +18,7 @@
       </b-col>
       <b-col></b-col> <!-- used to center the table -->
     </b-row>
-    <a-selection-handler :select-count="selectCount" @del="openModal('deleteTimeline')" @cancel="cancel" @edit="openModal('editTitle')"></a-selection-handler>
+    <a-selection-handler :select-count="selectCount" @del="openModal(null,'deleteTimeline')" @cancel="cancel" @edit="openModal(null,'editTitle')"></a-selection-handler>
     <b-modal  v-model="modal" :title="modalTitle" @shown="modalOpened" @hidden="modalClosed">
       <b-container fluid>
         <b-row>
@@ -51,6 +51,7 @@
 
 import aSelectionHandler from '../selection-handler/selection-handler.vue'
 import {formatDate, validTitle} from '../../scripts/script'
+import $ from 'jquery'
 
 /*
   The columns of the table.
@@ -104,6 +105,12 @@ export default {
       formatDate
     }
   },
+  mounted() {
+    let t = this
+    $('#app').click(function() {
+      t.clearSelected()
+    })
+  },
   computed: {
     timelines() {
       return this.$store.state.timelines
@@ -150,6 +157,7 @@ export default {
       There must have been an easier way to do this.
     */
     rowClicked: function(item, index, event) {
+      event.stopPropagation()
       if (item.selected) {
         if (event.ctrlKey) {
           deselectRow(item)
@@ -223,7 +231,9 @@ export default {
         }
       }
     },
-    openModal: function(type) {
+    openModal: function(event, type) {
+      if (event != null)
+        event.stopPropagation()
       this.modal = true
       this.modalType = type
     },
@@ -261,6 +271,14 @@ export default {
 
 .register {
   padding-top: 20px;
+  pointer-events: visibleStroke;
+  .btn-round {
+    margin-bottom: 10px;
+    @media screen and (max-width: 720px) {
+      width: 100%;
+      border-radius: 2px;
+    }
+  }
   table {
     background-color: $register-bg;
     color: $text;

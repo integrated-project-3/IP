@@ -1,5 +1,5 @@
 <template lang="html">
-  <b-row class="selection-handler" v-if="selectCount>0">
+  <b-row class="selection-handler" v-if="selectCount>0" @click="handlerClicked()">
     <b-col lg="8" offset-lg="2" md="10" offset-md="1" class="main">
       <h2>{{ selectCount }} timeline<span v-if="this.selectCount>1">s</span> selected</h2>
       <div class="buttons">
@@ -21,6 +21,10 @@ export default {
     }
   },
   methods: {
+    handlerClicked() {
+      // stops selected timelines from being cleared on register
+      event.stopPropagation()
+    },
     del: function() {
       this.$emit("del")
     },
