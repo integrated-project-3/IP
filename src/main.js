@@ -195,7 +195,19 @@ new Vue({
           }
           timelines.push(timeline)
         }
+        this.updateCurrentTimeline()
       })
+    },
+    updateCurrentTimeline() {
+       if (this.$store.state.currentTimeline === null) return
+      if (this.$store.state.timelines === null) return
+      if (this.$store.state.timelines[0] === null) return
+      var index = this.$store.state.timelines.map(function(e){return e.id}).indexOf(this.$store.state.currentTimeline.id)
+      if (index === -1) {
+        this.$store.commit('clearCurrentTimeline')
+      } else {
+        this.$store.commit('setCurrentTimeline',this.$store.state.timelines[index])
+      }
     }
   },
   mounted() {
