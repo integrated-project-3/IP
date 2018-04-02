@@ -47,7 +47,7 @@ const store = new Vuex.Store({
     clearCurrentTimeline(state) {
       state.currentTimeline = null
     },
-    setCurentEvent(state, event) {
+    setCurrentEvent(state, event) {
       state.currentEvent = event
     },
     clearCurrentEvent(state) {
@@ -99,7 +99,7 @@ const store = new Vuex.Store({
       */
       state.timelines.filter(t => t.selected).forEach(function(e){this.dispatch('deleteTimeline',e.id)}, this)
     },
-    changeTimelineTitle({ state, commit }, payload) {
+    changeTimelineTitle({ commit }, payload) {
       var id = payload.id
       var title = payload.title
       changeTimelineTitle(id, title).then(() => {
@@ -169,7 +169,7 @@ const store = new Vuex.Store({
     }
   },
   plugins: [createPersistedState({
-    paths: ['currentTimeline']
+    paths: ['currentTimeline','currentEvent']
  })]
 })
 
@@ -196,10 +196,11 @@ new Vue({
           timelines.push(timeline)
         }
         this.updateCurrentTimeline()
+        this.updateCurrentEvent()
       })
     },
     updateCurrentTimeline() {
-       if (this.$store.state.currentTimeline === null) return
+      if (this.$store.state.currentTimeline === null) return
       if (this.$store.state.timelines === null) return
       if (this.$store.state.timelines[0] === null) return
       var index = this.$store.state.timelines.map(function(e){return e.id}).indexOf(this.$store.state.currentTimeline.id)
@@ -207,6 +208,18 @@ new Vue({
         this.$store.commit('clearCurrentTimeline')
       } else {
         this.$store.commit('setCurrentTimeline',this.$store.state.timelines[index])
+      }
+    },
+    updateCurrentEvent() {
+      if (this.$store.state.currentEvent === null) return
+      if (this.$store.state.currentTimeline === null) return
+      if (this.$store.state.currentTimeline.timelineEvents === null) return
+      if (this.$store.state.currentTimeline.timelineEvents[0] === null) return
+      var index = this.$store.state.currentTimeline.timelineEvents.map(function(e){return e.Id}).indexOf(this.$store.state.currentEvent.Id)
+      if (index === -1) {
+        this.$store.commit('clearCurrentEvent')
+      } else {
+        this.$store.commit('setCurrentEvent',this.$store.state.currentTimeline.timelineEvents[index])
       }
     }
   },

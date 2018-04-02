@@ -1,5 +1,5 @@
 <template lang="html">
-  <b-row class="header" align-v="start" @click="headerClicked()">
+  <b-row class="header" id="header" align-v="start" @click="headerClicked()">
     <b-col md="6">
       <!-- Adds a logo which when clicked goes to the register. -->
       <a-logo />

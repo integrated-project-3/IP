@@ -158,7 +158,8 @@ export default {
 
     },
     openEvent: function() {
-
+      this.$store.commit('setCurrentEvent', this.selectedEvent)
+      this.$router.push({name: 'EVENT'})
     },
     deleteEvent: function() {
 
