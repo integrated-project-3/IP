@@ -7,7 +7,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
 import router from './router'
-import {getAll, createTimeline, deleteTimeline, changeTimelineTitle, createEvent, linkEventToTimeline, unlinkEventFromEvent, linkEventToEvent} from './scripts/api'
+import {getAll, createTimeline, deleteTimeline, changeTimelineTitle, createEvent, linkEventToTimeline, unlinkEventFromEvent, linkEventToEvent, deleteEvent} from './scripts/api'
 
 Vue.use(BootstrapVue)
 Vue.use(VueRouter)
@@ -60,6 +60,17 @@ const store = new Vuex.Store({
           if(payload.id === state.currentTimeline.id) {
             state.currentTimeline.title = payload.title
           }
+          return
+        }
+      }
+    },
+    removeEvent(state, id) {
+      for (var i = 0; i < state.currentTimeline.timelineEvents.length; i++) {
+        if (state.currentTimeline.timelineEvents[i].id === id) {
+          state.currentTimeline.timelineEvents.splice(i,1)
+          if (state.currentEvent != null)
+            if (state.currentEvent.id === id)
+              state.currentEvent = null
           return
         }
       }
@@ -160,6 +171,26 @@ const store = new Vuex.Store({
             })
           }
         })
+      })
+    },
+    deleteEvent({commit}, id) {
+      /*
+        if event is in another events linked list and event has an event in its linked list
+          put event after into event before's linked list
+        else if event is in another events linked list
+          remove event from linked list
+        else if event has an event in linked list
+          remove event from linked list
+        delete event
+        unlink from timeline
+      */
+      // let eventBeforeIndex = state.currentTimeline.timelineEvents.map(function(e) {if(e.LinkedTimelineEventIds != null)if(e.LinkedTimelineEventIds[0] != null)return e.LinkedTimelineEventIds[0]}).indexOf(id)
+      // let event = state.currentTimeline.timelineEvents.map(function (e) {return e.}
+      // if (eventBeforeIndex != -1 && ) {
+
+      // }
+      deleteEvent(id).then(() => {
+        commit('removeEvent', id)
       })
     }
   },

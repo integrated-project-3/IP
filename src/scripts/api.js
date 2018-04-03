@@ -122,3 +122,16 @@ export function unlinkEventFromEvent(eventId, unlinkedFromEventId) {
   })
   return put
 }
+
+export function deleteEvent(id) {
+  var put = axios.put('https://gcu.ideagen-development.com/TimelineEvent/Delete',
+    {
+      'AuthToken':'7cbc5c61-bcfa-47d8-a171-599616102147',
+      'TenantId':'Team19',
+      'TimelineEventId':id
+    }
+  ).catch(error => {
+    console.log(error)
+  })
+  return put
+}

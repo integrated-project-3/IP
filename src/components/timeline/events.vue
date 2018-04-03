@@ -1,34 +1,58 @@
 <template lang="html">
-  <div class="events" id="container" @mousedown="drag($event, 'down')" @mousemove="drag($event, 'drag')" @mouseup="drag($event, 'up')">
-    <div id="slider" :style="{width: sliderWidth}">
-      <div class="event" v-for="(e, index) in eventsInOrder" :key="e.id">
-        <div class="time" v-if="index === 0 || index === events.length-1">
-          <p>{{formatEventTime(e.EventDateTime)}}</p>
+  <div>
+    <div class="events" id="container" @mousedown="drag($event, 'down')" @mousemove="drag($event, 'drag')" @mouseup="drag($event, 'up')">
+      <div id="slider" :style="{width: sliderWidth}">
+        <div class="event" v-for="(e, index) in eventsInOrder" :key="e.id">
+          <div class="time" v-if="index === 0 || index === events.length-1">
+            <p>{{formatEventTime(e.EventDateTime)}}</p>
+          </div>
+          <div class="title" :id="e.Id" @click="clickedTitle($event)">
+            <p>{{e.Title}}</p>
+          </div>
+          <div v-if="index != events.length-1" id="h-line"></div>
+          <div v-if="index === 0 || index === events.length-1" id="v-line-time" class="v-line"></div>
+          <div v-if="selectedEvent.Id === e.Id" id="v-line-title" class="v-line"></div>
         </div>
-        <div class="title" :id="e.Id" @click="clickedTitle($event)">
-          <p>{{e.Title}}</p>
-        </div>
-        <div v-if="index != events.length-1" id="h-line"></div>
-        <div v-if="index === 0 || index === events.length-1" id="v-line-time" class="v-line"></div>
-        <div v-if="selectedEvent.Id === e.Id" id="v-line-title" class="v-line"></div>
-      </div>
-      <div class="info" id="event-info">
-        <div v-if="selectedEvent.Id != ''" >
-          <h2>{{selectedTitle}}<i class="material-icons icon" style="padding-left: 5px;">edit</i></h2>
-          <h4>{{selectedTime}} - {{selectedDate}}</h4>
-          <p>
-            {{selectedDescription}}
-          </p>
-          <b-btn variant="create" @click="openEvent">More</b-btn>
-          <b-btn variant="delete" @click="deleteEvent" style="float: right;">Delete</b-btn>
+        <div class="info" id="event-info">
+          <div v-if="selectedEvent.Id != ''" >
+            <h2>{{selectedTitle}}<i class="material-icons icon" style="padding-left: 5px;" @click="openModal('editEventTitle')">edit</i></h2>
+            <h4>{{selectedTime}} - {{selectedDate}}</h4>
+            <p>
+              {{selectedDescription}}
+            </p>
+            <b-btn variant="create" @click="openEvent">More</b-btn>
+            <b-btn variant="delete" @click="openModal('deleteEvent')" style="float: right;">Delete</b-btn>
+          </div>
         </div>
       </div>
     </div>
+    <b-modal  v-model="modal" :title="modalTitle" @shown="modalOpened" @hidden="modalClosed" size="lg">
+      <b-container fluid>
+        <b-row v-if="modalType === 'deleteEvent'">
+          <b-col>
+            <p>
+              Are you sure you wish to delete this event?
+            </p>
+          </b-col>
+        </b-row>
+        <b-row v-else-if="modalType === 'editEventTitle'">
+          <b-col>
+            <input type="text" v-model="newEventTitle" @keyup.enter="changeEventTitle" @keyup="checkTitleInput" placeholder="Enter new title" id="titleInput" />
+            <b-alert variant="danger" :show="showTitleWarning">Title must be at least 5 characters long</b-alert>
+          </b-col>
+        </b-row>
+      </b-container>
+      <div slot="modal-footer" class="w-100">
+        <b-btn class="float-left" @click="closeModal">CANCEL</b-btn>
+        <b-btn v-if="modalType === 'deleteEvent'" class="float-right" @click="deleteEvent">DELETE</b-btn>
+        <b-btn v-else-if="modalType === 'editEventTitle'" class="float-right" @click="changeEventTitle">SAVE</b-btn>
+      </div>
+    </b-modal>
   </div>
 </template>
 
 <script>
-import {formatEventTime, formatEventDate, sortEvents} from '../../scripts/script'
+import {formatEventTime, formatEventDate, sortEvents, validTitle} from '../../scripts/script'
 
 var drag = false
 var lastPos = []
@@ -52,7 +76,12 @@ export default {
         'Location': '',
         'LinkedTimelineEventIds': [],
         'Attachments': []
-      }
+      },
+      modal: false,
+      modalTitle: '',
+      newEventTitle: '',
+      showTitleWarning: false,
+      modalType: ''
     }
   },
   mounted() {
@@ -162,13 +191,65 @@ export default {
       this.$router.push({name: 'EVENT'})
     },
     deleteEvent: function() {
-
+      this.closeModal()
+      this.$store.dispatch('deleteEvent', this.selectedEvent.Id)
     },
     dateFromDateTime(dateTime) {
       return dateTime.substr(0,10)
     },
     timeFromDateTime(dateTime) {
       return dateTime.substr(11,16)
+    },
+    openModal(type) {
+      this.modal = true
+      this.modalType = type
+    },
+    closeModal() {
+      this.modal = !this.modal
+    },
+    modalOpened() {
+      if (this.modalType === "deleteEvent") {
+        this.modalTitle = "Delete"
+      } else if (this.modalType === "editEventTitle") {
+        document.getElementById('titleInput').focus()
+        this.modalTitle = "Edit"
+        this.newEventTitle = this.selectedEvent.Title
+      }
+    },
+    modalClosed() {
+      if (this.modalType === "editEventTitle") {
+        this.newEventTitle = ''
+        this.showTitleWarning = false
+      }
+      this.modalType = ''
+      this.modalTitle = ''
+    },
+    /* Called when a key is pressed on the create modal input. */
+    checkTitleInput: function() {
+      /*
+        If the user has tried to create a timeline that has less than 5 characters
+        then the warning gets shown.
+        This automatically hides the warning once they have entered at least 5 characters.
+      */
+      if (this.showTitleWarning === true) {
+        if (validTitle(this.newEventTitle)) {
+          this.showTitleWarning = false
+        }
+      }
+    },
+    changeEventTitle() {
+      if (!validTitle(this.newEventTitle)) {
+        document.getElementById('titleInput').focus()
+        this.showTitleWarning = true
+        return
+      }
+      this.closeModal()
+      // var payload = {
+      //   id: this.timeline.id,
+      //   title: this.newTimelineTitle
+      // }
+      // this.$store.dispatch('changeTimelineTitle', payload)
+      alert("changed")
     }
   }
 }
