@@ -1,4 +1,4 @@
-function formatDate(ticks) {
+export function formatDate(ticks) {
   const epochTicks = 621355968000000000;
   const ticksSinceEpoch = ticks - epochTicks;
   const millisecondsSinceEpoch = ticksSinceEpoch / 10000;
@@ -6,14 +6,14 @@ function formatDate(ticks) {
   return date.toLocaleDateString()
 }
 
-function formatEventTime(dateTime) {
+export function formatEventTime(dateTime) {
   if (dateTime.length === 16) {
     return dateTime.substring(11,17)
   }
   return "Time not available"
 }
 
-function formatEventDate(dateTime) {
+export function formatEventDate(dateTime) {
   if (dateTime.length === 16) {
     var day = dateTime.substr(8,2)
     var month = dateTime.substr(5,2)
@@ -23,7 +23,7 @@ function formatEventDate(dateTime) {
   return "Date not available"
 }
 
-function validTitle(str) {
+export function validTitle(str) {
   var s = str.replace(/\s/g,'')
   if (s.length >= 5) {
     return true
@@ -35,7 +35,7 @@ Array.prototype.diff = function(a) {
   return this.filter(function(i) {return a.indexOf(i) < 0})
 }
 
-function sortEvents(events) {
+export function sortEvents(events) {
 
   // seperate events into 2 lists, one for events with times, one for the rest.
   // need this for sorting by time.
@@ -115,8 +115,6 @@ function sortEvents(events) {
       }
     }
   }
-  
+
   return sortedEvents
 }
-
-export {formatDate, formatEventTime, formatEventDate, validTitle, sortEvents}
