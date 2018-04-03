@@ -3,37 +3,37 @@
     <div v-if="timeline != null">
       <div class="timeline">
         <b-row class="head" align-v="start">
-          <b-col md="2" class="buttons" id="back">
-            <b-btn variant="select" @click="back">Back</b-btn>
+          <b-col sm="12" lg="2" class="timeline-buttons">
+            <b-btn variant="select" @click="back" id="timeline-back-button">Back</b-btn>
           </b-col>
-          <b-col md="2" class="buttons" id="create">
-            <b-btn variant="create" @click="openModal('createEvent')" style="float: right;">Create new event</b-btn>
-          </b-col>
-          <b-col md="2" class="buttons" id="delete">
-            <b-btn variant="delete" @click="openModal('deleteTimeline')">Delete</b-btn>
-          </b-col>
-          <b-col md="6" class="timeline-details">
+          <b-col sm="12" lg="6" class="timeline-details">
             <h1>{{title}}<i v-on:click="openModal('editTimelineTitle')" class="material-icons icon">edit</i></h1>
             <h3>{{date}}</h3>
+          </b-col>
+          <b-col sm="6" lg="2" class="timeline-buttons" id="timeline-delete-div">
+            <b-btn variant="delete" @click="openModal('deleteTimeline')" id="timeline-delete-button">Delete timeline</b-btn>
+          </b-col>
+          <b-col sm="6" lg="2" class="timeline-buttons" id="timeline-create-div">
+            <b-btn variant="create" @click="openModal('createEvent')" style="float: right;" id="timeline-create-button">Create new event</b-btn>
           </b-col>
         </b-row>
         <b-row align-v="center" class="events">
           <a-events ref="events" :events="events"></a-events>
         </b-row>
       </div>
-      <b-modal  v-model="modal" :title="modalTitle" @shown="modalOpened" @hidden="modalClosed" size="lg">
+      <b-modal  v-model="modal" :title="modalTitle" @shown="modalOpened" @hidden="modalClosed" size="lg" id="timeline-modal">
         <b-container fluid>
           <b-row v-if="modalType === 'createEvent'">
-            <b-col md="6">
+            <b-col md="6" class="modal-half">
               <b-row>
-                <input type="text" v-model="newEventTitle" @keyup.enter="createEvent" @keyup="checkTitleInput" placeholder="Enter title" id="titleInput"/>
-                <b-alert variant="danger" :show="showTitleWarning">Title must be at least 5 characters long</b-alert>
+                <input type="text" v-model="newEventTitle" @keyup.enter="createEvent" @keyup="checkTitleInput" placeholder="Enter title" id="title-input"/>
+                <b-alert variant="danger" :show="showTitleWarning" id="title-alert">Title must be at least 5 characters long</b-alert>
               </b-row>
               <b-row>
-                <b-form-textarea id="textarea1" v-model="newEventDescription" placeholder="Enter description" :rows="3" :max-rows="8"/>
+                <b-form-textarea id="description-input" v-model="newEventDescription" placeholder="Enter description" :rows="8" no-resize/>
               </b-row>
             </b-col>
-            <b-col md="6">
+            <b-col md="6" class="modal-half">
               <b-row id="checkBoxCol">
                 <b-form-checkbox id="exactDateTime" v-model="exactDateTime">Exact date and time</b-form-checkbox>
               </b-row>
@@ -55,7 +55,7 @@
           </b-row>
           <b-row v-else-if="modalType === 'editTimelineTitle'">
             <b-col>
-              <input type="text" v-model="newTimelineTitle" @keyup.enter="changeTimelineTitle" @keyup="checkTitleInput" placeholder="Enter new title" id="titleInput" />
+              <input type="text" v-model="newTimelineTitle" @keyup.enter="changeTimelineTitle" @keyup="checkTitleInput" placeholder="Enter new title" id="title-input" />
               <b-alert variant="danger" :show="showTitleWarning">Title must be at least 5 characters long</b-alert>
             </b-col>
           </b-row>
@@ -78,7 +78,7 @@
 
 <script>
 import {formatDate, validTitle} from '../../scripts/script'
-import aEvents from './events'
+import aEvents from './timeline-events'
 
 export default {
   name: 'aTimeline',
@@ -160,12 +160,12 @@ export default {
     },
     modalOpened() {
       if (this.modalType === "createEvent") {
-        document.getElementById('titleInput').focus()
+        document.getElementById('title-input').focus()
         this.modalTitle = "Create"
       } else if (this.modalType === "deleteTimeline") {
         this.modalTitle = "Delete"
       } else if (this.modalType === "editTimelineTitle") {
-        document.getElementById('titleInput').focus()
+        document.getElementById('title-input').focus()
         this.modalTitle = "Edit"
         this.newTimelineTitle = this.title
       }
@@ -189,7 +189,7 @@ export default {
     },
     createEvent() {
       if (!validTitle(this.newEventTitle)) {
-        document.getElementById('titleInput').focus()
+        document.getElementById('title-input').focus()
         this.showTitleWarning = true
         return
       }
@@ -250,7 +250,7 @@ export default {
     },
     changeTimelineTitle() {
       if (!validTitle(this.newTimelineTitle)) {
-        document.getElementById('titleInput').focus()
+        document.getElementById('title-input').focus()
         this.showTitleWarning = true
         return
       }
@@ -265,52 +265,47 @@ export default {
 }
 </script>
 
-<style lang="scss" >
+<style lang="scss">
 @import '../../assets/styles/theme.scss';
 @import '../../assets/styles/main.scss';
 
 .timeline {
   padding-top: 20px;
   @media screen and (max-width: 720px) {
-    button {
-      width: 100%
+    .timeline-buttons {
+      &:nth-child(n+2) {margin-top: 10px;}
     }
-    #create button, #delete button {
-      margin-top: 10px;
-    }
-    .timeline-details {
-      // word-wrap: break-word;
-      overflow: auto;
-      h1, h3 {
-        font-size: 10vw;
-      }
-      i {
-        font-size: 8vw;
-      }
-    }
+    .timeline-details {overflow: auto;}
   }
   @media screen and (min-width: 720px) {
-    #create {
-      right: 0;
-      position: absolute;
-    }
-    #delete {
-      bottom: 0;
-      position: absolute;
-      padding: 15px;
-    }
-    .timeline-details {
-      overflow: hidden;
-      h1, h3 {
-        font-size: 3vw;
-      }
-      i {
-        font-size: 2vw;
+    .timeline-details {overflow: hidden;}
+  }
+  .timeline-buttons button {width: 100%;}
+  .timeline-details {
+    h1, h3 {
+      font-size: 2.5em;
+      display:inline;
+      &:last-child {
+        &::before{
+          content: ' - '
+        }
       }
     }
+    i {font-size: 0.7em;}
   }
 }
-.md-datepicker-dialog {
-  z-index: 1200 !important;
+#timeline-modal {
+  #title-input {
+    background-color: white;
+    border-bottom: 2px solid #EEEEEE;
+  }
+  #title-alert {
+    width: 100%;
+  }
+  #description-input {
+    margin-top: 20px;
+    border: 1px solid #38474E;
+  }
+  .modal-half {padding: 30px;}
 }
 </style>

@@ -57,7 +57,7 @@ body, #app {
 /*
   Buttons
 */
-button:not(.md-button, .btn-round) {
+button:not(.btn-round) {
   border: none;
   border-radius: 2px;
   min-width: 94px;
@@ -77,8 +77,4 @@ button:not(.md-button, .btn-round) {
 */
 i {
   cursor: pointer;
-}
-
-.md-datepicker-dialog, .md-overlay, .md-datepicker-overlay {
-  z-index: 1200 !important;
 }
