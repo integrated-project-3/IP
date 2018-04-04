@@ -7,7 +7,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
 import router from './router'
-import {getAll, createTimeline, deleteTimeline, changeTimelineTitle, createEvent, linkEventToTimeline, unlinkEventFromEvent, linkEventToEvent, deleteEvent} from './scripts/api'
+import {getAll, createTimeline, deleteTimeline, changeTimelineTitle, createEvent, linkEventToTimeline, unlinkEventFromEvent, linkEventToEvent, deleteEvent, changeEventTitle, unlinkEventFromTimeline} from './scripts/api'
 
 Vue.use(BootstrapVue)
 Vue.use(VueRouter)
@@ -66,11 +66,22 @@ const store = new Vuex.Store({
     },
     removeEvent(state, id) {
       for (var i = 0; i < state.currentTimeline.timelineEvents.length; i++) {
-        if (state.currentTimeline.timelineEvents[i].id === id) {
+        if (state.currentTimeline.timelineEvents[i].Id === id) {
           state.currentTimeline.timelineEvents.splice(i,1)
           if (state.currentEvent != null)
-            if (state.currentEvent.id === id)
+            if (state.currentEvent.Id === id)
               state.currentEvent = null
+          return
+        }
+      }
+    },
+    updateEventTitle(state, payload) {
+      for (var i = 0; i < state.currentTimeline.timelineEvents.length; i++) {
+        if (state.currentTimeline.timelineEvents[i].Id === payload.id) {
+          state.currentTimeline.timelineEvents[i].Title = payload.title
+          if(payload.id === state.currentEvent.Id) {
+            state.currentEvent.Title = payload.title
+          }
           return
         }
       }
@@ -173,24 +184,40 @@ const store = new Vuex.Store({
         })
       })
     },
-    deleteEvent({commit}, id) {
-      /*
-        if event is in another events linked list and event has an event in its linked list
-          put event after into event before's linked list
-        else if event is in another events linked list
-          remove event from linked list
-        else if event has an event in linked list
-          remove event from linked list
-        delete event
-        unlink from timeline
-      */
-      // let eventBeforeIndex = state.currentTimeline.timelineEvents.map(function(e) {if(e.LinkedTimelineEventIds != null)if(e.LinkedTimelineEventIds[0] != null)return e.LinkedTimelineEventIds[0]}).indexOf(id)
-      // let event = state.currentTimeline.timelineEvents.map(function (e) {return e.}
-      // if (eventBeforeIndex != -1 && ) {
+    deleteEvent({state, commit}, id) {
+      var eventBeforeIndex = state.currentTimeline.timelineEvents.map(function(e) {if(e.LinkedTimelineEventIds != null)if(e.LinkedTimelineEventIds[0] != null)return e.LinkedTimelineEventIds[0]}).indexOf(id)
+      var ev = state.currentTimeline.timelineEvents.filter(e => e.Id === id)[0]
+      var eventAfterId = ''
 
-      // }
+
+      if (ev.LinkedTimelineEventIds != null) { if (ev.LinkedTimelineEventIds[0] != null) {
+        eventAfterId = ev.LinkedTimelineEventIds[0]
+      }}
+
+      if (eventBeforeIndex != -1) {
+        unlinkEventFromEvent(state.currentTimeline.timelineEvents[eventBeforeIndex].Id, id).then(() => {
+          if (eventAfterId != '') {
+            linkEventToEvent(state.currentTimeline.timelineEvents[eventBeforeIndex].Id, eventAfterId)
+            state.currentTimeline.timelineEvents[eventBeforeIndex].LinkedTimelineEventIds[0] = eventAfterId
+          } else {
+            state.currentTimeline.timelineEvents[eventBeforeIndex].LinkedTimelineEventIds[0].slice(0,1)
+          }
+        })
+      }
+
       deleteEvent(id).then(() => {
-        commit('removeEvent', id)
+        unlinkEventFromTimeline(id, state.currentTimeline.id).then(() => {
+          commit('removeEvent', id)
+        })
+      })
+
+
+    },
+    changeEventTitle({ commit }, payload) {
+      var id = payload.id
+      var title = payload.title
+      changeEventTitle(id, title).then(() => {
+        commit('updateEventTitle', {id, title})
       })
     }
   },

@@ -193,6 +193,7 @@ export default {
     deleteEvent: function() {
       this.closeModal()
       this.$store.dispatch('deleteEvent', this.selectedEvent.Id)
+      this.clearSelected()
     },
     dateFromDateTime(dateTime) {
       return dateTime.substr(0,10)
@@ -244,12 +245,11 @@ export default {
         return
       }
       this.closeModal()
-      // var payload = {
-      //   id: this.timeline.id,
-      //   title: this.newTimelineTitle
-      // }
-      // this.$store.dispatch('changeTimelineTitle', payload)
-      alert("changed")
+      var payload = {
+        id: this.selectedEvent.Id,
+        title: this.newEventTitle
+      }
+      this.$store.dispatch('changeEventTitle', payload)
     }
   }
 }

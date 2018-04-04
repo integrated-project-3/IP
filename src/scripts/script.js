@@ -7,14 +7,14 @@ export function formatDate(ticks) {
 }
 
 export function formatEventTime(dateTime) {
-  if (dateTime.length === 16) {
-    return dateTime.substring(11,17)
+  if (dateTime.length === 16 || dateTime.length === 18) {
+    return dateTime.substring(11,16)
   }
   return "Time not available"
 }
 
 export function formatEventDate(dateTime) {
-  if (dateTime.length === 16) {
+  if (dateTime.length === 16 || dateTime.length === 18) {
     var day = dateTime.substr(8,2)
     var month = dateTime.substr(5,2)
     var year = dateTime.substr(0,4)
@@ -36,12 +36,22 @@ Array.prototype.diff = function(a) {
 }
 
 export function sortEvents(events) {
+  var eventsWithTime = []
+  var eventsWithoutTime = []
 
-  // seperate events into 2 lists, one for events with times, one for the rest.
-  // need this for sorting by time.
-  var eventsWithTime = events.filter(event => event.EventDateTime != 'n/a')
-  var eventsWithoutTime = events.diff(eventsWithTime)
-  // events = []
+  for (let i = 0; i < events.length; i++) {
+    if (events[i].EventDateTime.slice(-2) !== 'BA') {
+      eventsWithTime.push(events[i])
+    } else {
+      eventsWithoutTime.push(events[i])
+    }
+  }
+
+  if (eventsWithTime.length === 0) {
+    if (eventsWithoutTime.length > 0) {
+      eventsWithTime.push(eventsWithoutTime.splice(0,1)[0])
+    }
+  }
 
   var sortedEvents = eventsWithTime.sort(function(a,b) {
     a = new Date(a.EventDateTime)
@@ -49,52 +59,6 @@ export function sortEvents(events) {
     return a - b
   })
 
-  // for (var i = 0; i < eventsWithoutTime.length; i++) {
-  //   var index = sortedEvents.map(function(e) {if (e.LinkedTimelineEventIds != null) if(e.LinkedTimelineEventIds[0] != null) return e.LinkedTimelineEventIds[0]}).indexOf(eventsWithoutTime[i].Id) +1
-  //   if (index === 0) index = sortedEvents.map(function(e) {return e.Id}).indexOf(eventsWithoutTime[i].LinkedTimelineEventIds[0])
-  //   sortedEvents.splice(index, 0, eventsWithoutTime[i])
-  // }
-
-  // for (var i = 0; i < eventsWithoutTime.length; i++) {
-  //   var index = sortedEvents.map(function(e) {if (e.LinkedTimelineEventIds != null) if(e.LinkedTimelineEventIds[0] != null) return e.LinkedTimelineEventIds[0]}).indexOf(eventsWithoutTime[i].Id) +1
-  //   if (index === 0) {
-  //     if (eventsWithoutTime[i].LinkedTimelineEventIds != null) {
-  //       if (eventsWithoutTime[i].LinkedTimelineEventIds[0] != null) {
-  //         index = sortedEvents.map(function(e) {return e.Id}).indexOf(eventsWithoutTime[i].LinkedTimelineEventIds[0])
-  //       } else {
-  //         break
-  //       }
-  //     } else {
-  //       break
-  //     }
-  //   }
-  //   // if (index != -1)
-  //     sortedEvents.splice(index, 0, eventsWithoutTime[i])
-  // }
-
-  // var i = 0
-  // while (eventsWithoutTime.length > 0) {
-  //   console.log("1: " + i)
-  //   console.log("1: " + eventsWithoutTime)
-  //   for (var j = 0; j < sortedEvents.length; j++) {
-  //     var index = sortedEvents.map(function(e) {if (e.LinkedTimelineEventIds != null) if(e.LinkedTimelineEventIds[0] != null) return e.LinkedTimelineEventIds[0]}).indexOf(eventsWithoutTime[i].Id) +1
-  //     if (index === 0) {
-  //       if (eventsWithoutTime[i].LinkedTimelineEventIds != null) {
-  //         if (eventsWithoutTime[i].LinkedTimelineEventIds[0] != null) {
-  //           index = sortedEvents.map(function(e) {return e.Id}).indexOf(eventsWithoutTime[i].LinkedTimelineEventIds[0])
-  //         }
-  //       }
-  //     }
-  //     if (index != -1) {
-  //       sortedEvents.splice(index, 0, eventsWithoutTime.splice(i,1))
-  //       break
-  //     }
-  //   }
-  //   // i += 1
-  //   console.log("2: " + i)
-  //   console.log("2: " + eventsWithoutTime)
-  //   // if (i === eventsWithoutTime.length) i = 0
-  // }
   while (eventsWithoutTime.length != 0) {
     for (var i = eventsWithoutTime.length-1; i >= 0; i--) {
       var index = sortedEvents.map(function(e) {if (e.LinkedTimelineEventIds != null) if(e.LinkedTimelineEventIds[0] != null) return e.LinkedTimelineEventIds[0]}).indexOf(eventsWithoutTime[i].Id) +1

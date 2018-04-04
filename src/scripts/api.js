@@ -65,7 +65,6 @@ export function changeTimelineTitle(id, title) {
 }
 
 export function createEvent(payload) {
-  var dateTime = payload.dateTime || 'n/a'
   var put = axios.put('https://gcu.ideagen-development.com/TimelineEvent/Create',
     {
     'AuthToken':'7cbc5c61-bcfa-47d8-a171-599616102147',
@@ -73,7 +72,7 @@ export function createEvent(payload) {
     'TimelineEventId': GUID(),
     'Title': payload.title,
     'Description': payload.description,
-    'EventDateTime': dateTime
+    'EventDateTime': payload.dateTime
     }
   ).catch(error => {
     console.log(error)
@@ -88,6 +87,20 @@ export function linkEventToTimeline(eventId, timelineId) {
       'TenantId':'Team19',
       'TimelineId': timelineId,
       'EventId': eventId
+    }
+  ).catch(error => {
+    console.log(error)
+  })
+  return put
+}
+
+export function unlinkEventFromTimeline(eventId, timelineId) {
+  var put = axios.put('https://gcu.ideagen-development.com/Timeline/UnlinkEvent',
+    {
+      'AuthToken':'7cbc5c61-bcfa-47d8-a171-599616102147',
+      'TenantId':'Team19',
+      'EventId': eventId,
+      'TimelineId': timelineId
     }
   ).catch(error => {
     console.log(error)
@@ -129,6 +142,20 @@ export function deleteEvent(id) {
       'AuthToken':'7cbc5c61-bcfa-47d8-a171-599616102147',
       'TenantId':'Team19',
       'TimelineEventId':id
+    }
+  ).catch(error => {
+    console.log(error)
+  })
+  return put
+}
+
+export function changeEventTitle(id, title) {
+  var put = axios.put('https://gcu.ideagen-development.com/TimelineEvent/EditDescription',
+    {
+      'AuthToken':'7cbc5c61-bcfa-47d8-a171-599616102147',
+      'TenantId':'Team19',
+      'Title': title,
+      'TimelineEventId': id
     }
   ).catch(error => {
     console.log(error)
