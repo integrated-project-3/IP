@@ -224,8 +224,8 @@ export default {
         payload.beforeAfter = this.beforeAfterSelect
         payload.eventId = this.eventSelect
         payload.dateTime = this.events.filter(event => event.Id === this.eventSelect)[0].EventDateTime
-        if (payload.dateTime.slice(-2) !== 'BA')
-          payload.dateTime = payload.dateTime + 'BA'
+        // if (payload.dateTime.slice(-2) !== 'BA')
+        //   payload.dateTime = payload.dateTime + 'BA'
         this.$store.dispatch('createEventBA', payload)
       } else {
         payload.dateTime = this.newEventDateTime

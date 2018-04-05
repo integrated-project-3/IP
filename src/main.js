@@ -189,7 +189,6 @@ const store = new Vuex.Store({
       var ev = state.currentTimeline.timelineEvents.filter(e => e.Id === id)[0]
       var eventAfterId = ''
 
-
       if (ev.LinkedTimelineEventIds != null) { if (ev.LinkedTimelineEventIds[0] != null) {
         eventAfterId = ev.LinkedTimelineEventIds[0]
       }}

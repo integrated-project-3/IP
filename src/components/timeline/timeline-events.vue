@@ -263,7 +263,7 @@ export default {
   overflow: hidden;
   height: 500px;
   cursor: pointer;
-  width: 100%;
+  width: 100vw;
   height: 500px;
   // box-shadow: 0 0 5px 5px rgba(0, 0, 0, .1);
   padding-top: 10px;

@@ -162,3 +162,17 @@ export function changeEventTitle(id, title) {
   })
   return put
 }
+
+export function changeEventDate(id, dateTime) {
+  var put = axios.put('https://gcu.ideagen-development.com/TimelineEvent/EditEventDateTime',
+    {
+      'AuthToken':'7cbc5c61-bcfa-47d8-a171-599616102147',
+      'TenantId':'Team19',
+      'EventDateTime': dateTime,
+      'TimelineEventId': id
+    }
+  ).catch(error => {
+    console.log(error)
+  })
+  return put
+}
