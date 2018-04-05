@@ -123,8 +123,13 @@ export default {
       return ""
     },
     selectedDescription() {
-      if (this.selectedEvent.Description != null)
-        return this.selectedEvent.Description.substr(0,90) + '...'
+      if (this.selectedEvent.Description != null) {
+        var s = this.selectedEvent.Description
+        if (s.length > 90) {
+          s = s.substr(0,90) + '...'
+        }
+        return s
+      }
       return ""
     }
   },
