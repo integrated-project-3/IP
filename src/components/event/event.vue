@@ -3,19 +3,16 @@
     <div v-if="event != null">
       <b-row>
         <b-col md="10" offset-md="1" class="event-page" id="event-page">
-          <b-row class="event-header">
-            <b-col md="1">
-              <b-btn class="btn-round" variant="create" @click="back"><i class="material-icons">arrow_back</i></b-btn>
+          <b-row class="head" align-v="start">
+            <b-col sm="12" lg="2" class="event-buttons">
+              <b-btn variant="select" @click="back" id="event-back-button">Back</b-btn>
             </b-col>
-            <b-col md="1" id="delete">
-              <b-btn class="btn-round" variant="delete" @click="openModal('deleteEvent')"><i class="material-icons">delete</i></b-btn>
+            <b-col sm="12" lg="8" class="event-details">
+              <h1>{{title}}<i v-on:click="openModal('editEventTitle')" class="material-icons icon">edit</i></h1>
+              <h3>{{date}} - {{time}}<i class="material-icons date-range">date_range</i></h3>
             </b-col>
-            <b-col md="5">
-              <h1>{{title}}</h1>
-            </b-col>
-            <b-col md="5">
-              <h1 v-if="this.event.EventDateTime === 'n/a'"></h1>
-              <h1 v-else>{{date}} - {{time}} <i class="material-icons date-range">date_range</i></h1>
+            <b-col sm="12" lg="2" class="event-buttons">
+              <b-btn variant="delete" @click="openModal('deleteEvent')" id="event-delete-button">Delete event</b-btn>
             </b-col>
           </b-row>
         </b-col>
@@ -82,38 +79,60 @@ export default {
 .event-page {
   background-color: $event-bg;
   margin-top: 20px;
-  .event-header {
-    padding: 20px;
-    @media screen and (max-width: 720px) {
-      text-align: center;
+  // .event-header {
+    // padding: 20px;
+    // @media screen and (max-width: 720px) {
+    //   text-align: center;
+    // }
+    // .btn-round {
+    //   position: relative;
+    //   bottom: 50%;
+    //   transform: translateY(50%);
+    //   font-size: 1px;
+    //   padding: 0;
+    //   @media screen and (max-width: 720px) {
+    //     width: 100%;
+    //     border-radius: 2px;
+    //   }
+    // }
+    // #delete {
+    //   @media screen and (min-width: 720px) {
+    //     position: absolute;
+    //     right: 0;
+    //     top: 0;
+    //   }
+    //   @media screen and (max-width: 720px) {
+    //     margin-top: 20px;
+    //   }
+    // }
+    // h1 {
+    //   display: inline;
+    // }
+    // i.date-range {
+    //   font-size: 0.9em;
+    // }
+  // }
+  @media screen and (max-width: 720px) {
+    .event-buttons {
+      &:nth-child(n+2) {margin-top: 10px;}
     }
-    .btn-round {
-      position: relative;
-      bottom: 50%;
-      transform: translateY(50%);
-      font-size: 1px;
-      padding: 0;
-      @media screen and (max-width: 720px) {
-        width: 100%;
-        border-radius: 2px;
+    .event-details {overflow: auto;}
+  }
+  @media screen and (min-width: 720px) {
+    .event-details {overflow: hidden;}
+  }
+  .event-buttons button {width: 100%;}
+  .event-details {
+    h1, h3 {
+      // font-size: 2.5em;
+      display:inline-block;
+      &:last-child {
+        &::before{
+          content: ' - '
+        }
       }
     }
-    #delete {
-      @media screen and (min-width: 720px) {
-        position: absolute;
-        right: 0;
-        top: 0;
-      }
-      @media screen and (max-width: 720px) {
-        margin-top: 20px;
-      }
-    }
-    h1 {
-      display: inline;
-    }
-    i.date-range {
-      font-size: 0.9em;
-    }
+    i {font-size: 0.7em;}
   }
 }
 </style>

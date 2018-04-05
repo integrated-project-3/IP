@@ -344,6 +344,11 @@ export default {
     width: 300px;
     max-height: 200px;
     padding: 10px;
+    h2 {
+      // overflow: hidden;
+      white-space: nowrap;
+    }
+    overflow: hidden;
     .icon {
       cursor: pointer;
     }

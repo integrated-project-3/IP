@@ -10,7 +10,7 @@
             <h1>{{title}}<i v-on:click="openModal('editTimelineTitle')" class="material-icons icon">edit</i></h1>
             <h3>{{date}}</h3>
           </b-col>
-          <b-col sm="6" lg="2" class="timeline-buttons" id="timeline-delete-div">
+          <b-col sm="6" lg="2" class="timeline-buttons">
             <b-btn variant="delete" @click="openModal('deleteTimeline')" id="timeline-delete-button">Delete timeline</b-btn>
           </b-col>
           <b-col sm="6" lg="2" class="timeline-buttons" id="timeline-create-div">
@@ -286,7 +286,7 @@ export default {
   .timeline-buttons button {width: 100%;}
   .timeline-details {
     h1, h3 {
-      font-size: 2.5em;
+      // font-size: 2.5em;
       display:inline;
       &:last-child {
         &::before{
