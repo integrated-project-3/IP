@@ -149,22 +149,28 @@ export function sortEvents(events) {
 
   var eventsWithLinkedEvents = []
 
-  for (var i = sortedEvents.length-1; i >= 0; i--) {
+  for (let i = sortedEvents.length-1; i >= 0; i--) {
     if (hasLinkedEvent(sortedEvents[i])) {
       eventsWithLinkedEvents.push(sortedEvents.splice(i,1)[0])
     }
   }
 
   while (eventsWithLinkedEvents.length != 0) {
-    for (var i = eventsWithLinkedEvents.length-1; i >= 0; i--) {
-      var index = sortedEvents.map(function(e) {if (e.LinkedTimelineEventIds != null) if(e.LinkedTimelineEventIds[0] != null) return e.LinkedTimelineEventIds[0]}).indexOf(eventsWithLinkedEvents[i].Id) +1
+    for (let i = eventsWithLinkedEvents.length-1; i >= 0; i--) {
+      // var index = sortedEvents.map(function(e) {if (e.LinkedTimelineEventIds != null) if(e.LinkedTimelineEventIds[0] != null) return e.LinkedTimelineEventIds[0]}).indexOf(eventsWithLinkedEvents[i].Id) +1
+      var index = sortedEvents.map(function(e){if (hasLinkedEvent(e)) return e.LinkedTimelineEventIds[0]}).indexOf(eventsWithLinkedEvents[i].Id)+1
       if (index === 0) {
-        if (eventsWithLinkedEvents[i].LinkedTimelineEventIds != null) {
-          if (eventsWithLinkedEvents[i].LinkedTimelineEventIds[0] != null) {
-            index = sortedEvents.map(function(e) {return e.Id}).indexOf(eventsWithLinkedEvents[i].LinkedTimelineEventIds[0])
-          } else {
-            index = -1
-          }
+        // if (eventsWithLinkedEvents[i].LinkedTimelineEventIds != null) {
+        //   if (eventsWithLinkedEvents[i].LinkedTimelineEventIds[0] != null) {
+        //     index = sortedEvents.map(function(e) {return e.Id}).indexOf(eventsWithLinkedEvents[i].LinkedTimelineEventIds[0])
+        //   } else {
+        //     index = -1
+        //   }
+        // } else {
+        //   index = -1
+        // }
+        if (hasLinkedEvent(eventsWithLinkedEvents[i])) {
+          index = sortedEvents.map(function(e) {return e.Id}).indexOf(eventsWithLinkedEvents[i].LinkedTimelineEventIds[0])
         } else {
           index = -1
         }
