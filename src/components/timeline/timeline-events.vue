@@ -88,21 +88,25 @@ export default {
     var slider = document.getElementById("slider")
     // slider.style.width = this.sliderWidth()
     require('mouse-wheel')((dx, dy, dz, ev) => {
-      if (ev.ctrlKey) {
-        ev.preventDefault()
-        if (dy > 0 && this.scale > .2) {
-          this.scale -= .1
+      if (this.isWidthLarge()) {
+        if (ev.ctrlKey) {
+          ev.preventDefault()
+          if (dy > 0 && this.scale > .2) {
+            this.scale -= .1
+          }
+          if (dy < 1.2) {
+            this.scale += .1
+          }
+          slider.style.transform = "scale("+this.scale+")"
         }
-        if (dy < 1.2) {
-          this.scale += .1
-        }
-        slider.style.transform = "scale("+this.scale+")"
       }
     })
   },
   computed: {
     sliderWidth() {
+      // if (this.isWidthLarge()) {
       return 375 * this.events.length + "px"
+      // }
     },
     eventsInOrder() {
       return sortEvents(this.events)
@@ -255,6 +259,10 @@ export default {
         title: this.newEventTitle
       }
       this.$store.dispatch('changeEventTitle', payload)
+    },
+    isWidthLarge() {
+      var width = window.outerWidth
+      return width > 992
     }
   }
 }
@@ -264,6 +272,8 @@ export default {
 @import '../../assets/styles/theme.scss';
 @import '../../assets/styles/main.scss';
 
+$width-large: 992px;
+
 .events {
   overflow: hidden;
   height: 500px;
@@ -272,12 +282,19 @@ export default {
   height: 500px;
   // box-shadow: 0 0 5px 5px rgba(0, 0, 0, .1);
   padding-top: 10px;
+  @media screen and (max-width: $width-large) {
+    height: auto;
+  }
   #slider {
     position: relative;
     top: 0;
     left: 0;
     transform-origin: 0 0;
     pointer-events: none;
+    @media screen and (max-width: $width-large) {
+      transform: scale(1) !important;
+      width: 100% !important;
+    }
   }
   #h-line {
     width: 75px;
@@ -285,6 +302,9 @@ export default {
     position: relative;
     top: -35px;
     right: -300px;
+    @media screen and (max-width: $width-large) {
+      display: none;
+    }
   }
   .v-line {
     height: 50px;
@@ -298,6 +318,9 @@ export default {
       margin-left: 150px;
       margin-top: -120px;
     }
+    @media screen and (max-width: $width-large) {
+      display: none;
+    }
   }
   .event {
     margin-left: 37.5px;
@@ -306,6 +329,10 @@ export default {
     text-align: center;
     cursor: default;
     pointer-events: all;
+    @media screen and (max-width: $width-large) {
+      width: 100%;
+      margin: 0;
+    }
     p {
       position: relative;
       top: 50%;
@@ -319,6 +346,10 @@ export default {
       height: 70px;
       margin: auto;
       transform: skewX(-10deg);
+      @media screen and (max-width: $width-large) {
+        display: none;
+        background-color: red;
+      }
     }
     .title {
       background-color: white;
@@ -330,6 +361,10 @@ export default {
       &.selected {
         background-color: $select;
         color: white;
+      }
+      @media screen and (max-width: $width-large) {
+        width: 100%;
+        margin-top: 0;
       }
     }
   }
