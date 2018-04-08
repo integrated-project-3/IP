@@ -14,14 +14,20 @@
           <div v-if="selectedEvent.Id === e.Id" id="v-line-title" class="v-line"></div>
         </div>
         <div class="info" id="event-info">
-          <div v-if="selectedEvent.Id != ''" >
-            <h2>{{selectedTitle}}<i class="material-icons icon" style="padding-left: 5px;" @click="openModal('editEventTitle')">edit</i></h2>
-            <h4>{{selectedTime}} - {{selectedDate}}</h4>
-            <p>
-              {{selectedDescription}}
-            </p>
-            <b-btn variant="create" @click="openEvent">More</b-btn>
-            <b-btn variant="delete" @click="openModal('deleteEvent')" style="float: right;">Delete</b-btn>
+          <div v-if="selectedEvent.Id != ''" id="event-info-inner">
+            <div v-if="isWidthLarge()">
+              <h2>{{selectedTitle}}<i class="material-icons icon" style="padding-left: 5px;" @click="openModal('editEventTitle')">edit</i></h2>
+              <h4>{{selectedTime}} - {{selectedDate}}</h4>
+              <p>
+                {{selectedDescription}}
+              </p>
+              <b-btn variant="create" @click="openEvent">More</b-btn>
+              <b-btn variant="delete" @click="openModal('deleteEvent')" style="float: right;">Delete</b-btn>
+            </div>
+            <div v-else class="event-info-mobile">
+              <b-btn variant="create" @click="openEvent">More</b-btn>
+              <b-btn variant="delete" @click="openModal('deleteEvent')" style="float: right;">Delete</b-btn>
+            </div>
           </div>
         </div>
       </div>
@@ -53,6 +59,7 @@
 
 <script>
 import {formatEventTime, formatEventDate, sortEvents, validTitle} from '../../scripts/script'
+import $ from 'jquery'
 
 var drag = false
 var lastPos = []
@@ -100,6 +107,12 @@ export default {
           slider.style.transform = "scale("+this.scale+")"
         }
       }
+    })
+
+    var self = this
+
+    $(window).resize(function() {
+      self.clearSelected()
     })
   },
   computed: {
@@ -167,10 +180,19 @@ export default {
       event.srcElement.classList.add("selected")
       this.selectedEvent = this.getEventFromId(event.srcElement.id)
 
-      var eventX = event.srcElement.offsetLeft
-
       var info = document.getElementById("event-info")
-      info.style.left = eventX + "px"
+      if (this.isWidthLarge()) {
+        var eventX = event.target.offsetLeft
+        info.style.left = eventX + "px"
+        info.style.top = ''
+      } else {
+        var eventY = event.target.offsetTop + 18
+        // var x = window.outerWidth - 200
+        var x = event.target.offsetLeft + $(".event").width() - 200
+        info.style.top = eventY + "px"
+        info.style.left = x + "px"
+      }
+
 
     },
     clearSelected: function() {
@@ -284,6 +306,8 @@ $width-large: 992px;
   padding-top: 10px;
   @media screen and (max-width: $width-large) {
     height: auto;
+    width: 100%;
+    margin: auto;
   }
   #slider {
     position: relative;
@@ -332,12 +356,17 @@ $width-large: 992px;
     @media screen and (max-width: $width-large) {
       width: 100%;
       margin: 0;
+      text-align: left;
+      padding-top: 1px;
     }
     p {
       position: relative;
       top: 50%;
       transform: translateY(-50%);
       pointer-events: none;
+      @media screen and (max-width: $width-large) {
+        padding-left: 20px;
+      }
     }
     .time {
       background-color: $text;
@@ -373,7 +402,7 @@ $width-large: 992px;
     pointer-events: all;
     cursor: default;
   }
-  .info div{
+  .info #event-info-inner{
     background-color: white;
     box-shadow: 0 16px 16px rgba(0, 0, 0, .16);
     width: 300px;
@@ -387,8 +416,12 @@ $width-large: 992px;
     .icon {
       cursor: pointer;
     }
-    #delete-event {
-      font-size: 19px;
+
+    @media screen and (max-width: $width-large) {
+      width: 198px;
+      padding: 0;
+      background-color: inherit;
+      box-shadow: none;
     }
   }
 }
