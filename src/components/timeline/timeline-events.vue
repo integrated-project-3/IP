@@ -16,8 +16,8 @@
         <div class="info" id="event-info">
           <div v-if="selectedEvent.Id != ''" id="event-info-inner">
             <div v-if="isWidthLarge()">
-              <h2>{{selectedTitle}}<i class="material-icons icon" style="padding-left: 5px;" @click="openModal('editEventTitle')">edit</i></h2>
-              <h4>{{selectedTime}} - {{selectedDate}}</h4>
+              <h3 @click="openModal('editEventTitle')" style="cursor: pointer;">{{selectedTitle}}</h3>
+              <h4>{{selectedDate}} - {{selectedTime}}</h4>
               <p>
                 {{selectedDescription}}
               </p>
@@ -408,7 +408,7 @@ $width-large: 992px;
     width: 300px;
     max-height: 200px;
     padding: 10px;
-    h2 {
+    h3 {
       // overflow: hidden;
       white-space: nowrap;
     }
