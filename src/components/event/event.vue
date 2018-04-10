@@ -3,7 +3,7 @@
     <div v-if="event != null">
       <b-row>
         <b-col md="10" offset-md="1" class="event-page" id="event-page">
-          <b-row class="head" align-v="start">
+          <b-row class="event-head" align-v="start">
             <b-col sm="12" lg="2" class="event-buttons">
               <b-btn variant="select" @click="back" id="event-back-button">Back</b-btn>
             </b-col>
@@ -17,10 +17,16 @@
           </b-row>
           <b-row class="event-main" align-v="center">
             <b-col sm="12">
-              <h1>Description</h1>
-              <i class="material-icons description-controls" id="save-description" v-if="description !== newEventDescription" @click="saveDescription">done</i>
-              <i class="material-icons description-controls" id="cancel-description" v-if="description !== newEventDescription" @click="cancelDescription">close</i>
-              <b-form-textarea id="event-description" v-model="newEventDescription" style="cursor: pointer;" no-resize/>
+              <div class="description">
+                <h1>Description</h1>
+                <span id="controls">
+                  <!-- <i class="material-icons description-controls" id="save-description" v-if="description !== newEventDescription" @click="saveDescription">done</i>
+                  <i class="material-icons description-controls" id="cancel-description" v-if="description !== newEventDescription" @click="cancelDescription">close</i> -->
+                  <b-btn id="cancel-description" variant="cancel" v-if="description !== newEventDescription" @click="cancelDescription">Cancel</b-btn>
+                  <b-btn id="save-description" variant="save" v-if="description !== newEventDescription" @click="saveDescription">Save</b-btn>
+                </span>
+                <b-form-textarea id="event-description" placeholder="Enter description" v-model="newEventDescription" style="cursor: pointer;" no-resize/>
+              </div>
             </b-col>
           </b-row>
         </b-col>
@@ -43,7 +49,6 @@
 
 <script>
 import {formatEventDate, formatEventTime} from '../../scripts/script'
-import $ from 'jquery'
 
 export default {
   name: 'aTimeline',
@@ -109,66 +114,63 @@ export default {
 .event-page {
   background-color: $event-bg;
   margin-top: 20px;
-  // .event-header {
-    // padding: 20px;
-    // @media screen and (max-width: 720px) {
-    //   text-align: center;
-    // }
-    // .btn-round {
-    //   position: relative;
-    //   bottom: 50%;
-    //   transform: translateY(50%);
-    //   font-size: 1px;
-    //   padding: 0;
-    //   @media screen and (max-width: 720px) {
-    //     width: 100%;
-    //     border-radius: 2px;
-    //   }
-    // }
-    // #delete {
-    //   @media screen and (min-width: 720px) {
-    //     position: absolute;
-    //     right: 0;
-    //     top: 0;
-    //   }
-    //   @media screen and (max-width: 720px) {
-    //     margin-top: 20px;
-    //   }
-    // }
-    // h1 {
-    //   display: inline;
-    // }
-    // i.date-range {
-    //   font-size: 0.9em;
-    // }
-  // }
-  @media screen and (max-width: 720px) {
-    .event-buttons {
-      &:nth-child(n+2) {margin-top: 10px;}
+  // height: stretch;
+  .event-head {
+    padding: 20px;
+    box-shadow: 0 3px 6px rgba(0,0,0,.16);
+    @media screen and (max-width: 720px) {
+      .event-buttons {
+        &:nth-child(n+2) {margin-top: 10px;}
+      }
+      .event-details {overflow: auto;}
     }
-    .event-details {overflow: auto;}
-  }
-  @media screen and (min-width: 720px) {
-    .event-details {overflow: hidden;}
-  }
-  .event-buttons button {width: 100%;}
-  .event-details {
-    h1, h3 {
-      // font-size: 2.5em;
-      display:inline-block;
-      &:last-child {
-        &::before{
-          content: ' - '
+    @media screen and (min-width: 720px) {
+      .event-details {overflow: hidden;}
+    }
+    .event-buttons button {width: 100%;}
+    .event-details {
+      h1, h3 {
+        // font-size: 2.5em;
+        display:inline-block;
+        &:last-child {
+          &::before{
+            content: ' - '
+          }
         }
       }
+      i {font-size: 0.7em;}
     }
-    i {font-size: 0.7em;}
   }
   .event-main {
-    h1 {
-      display: inline;
-    }
-    #event-description {
+    padding: 20px;
+    .description {
+      @media screen and (max-width: 500px) {
+        // text-align: center;
+      }
+      h1 {display: inline;}
+      #controls {
+        float: right;
+        @media screen and (max-width: 500px) {
+          width: 100%;
+        }
+        button {
+          &:not(:last-child) {margin-right: 5px;}
+          @media screen and (max-width: 500px) {
+            width: 49%;
+          }
+        }
+      }
+      textarea {
+        border: none;
+        overflow: auto;
+        outline: none;
+        -webkit-box-shadow: none;
+        -moz-box-shadow: none;
+        box-shadow: none;
+        &:focus {
+          background-color: $edit-description;
+        }
+      }
     }
   }
 }

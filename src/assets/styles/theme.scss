@@ -8,8 +8,13 @@ $header-bg: white;
 $search-bg: #EEEEEE;
 $register-bg: white;
 $event-bg: white;
+$edit-description: #EEEEEE;
+$cancel: #ED5E68;
+$save: #13AB94;
 
 .btn-create {background-color: $create; color: white;}
 .btn-cancel {background-color: $cancel; color: white;}
 .btn-delete {background-color: $delete; color: white;}
 .btn-select {background-color: $select; color: white;}
+.btn-save {background-color: $save; color: white;}
+.btn-cancel {background-color: $cancel; color: white;}
