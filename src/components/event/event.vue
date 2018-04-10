@@ -22,7 +22,7 @@
                 <span id="controls">
                   <!-- <i class="material-icons description-controls" id="save-description" v-if="description !== newEventDescription" @click="saveDescription">done</i>
                   <i class="material-icons description-controls" id="cancel-description" v-if="description !== newEventDescription" @click="cancelDescription">close</i> -->
-                  <b-btn id="cancel-description" variant="cancel" v-if="description !== newEventDescription" @click="cancelDescription">Cancel</b-btn>
+                  <b-btn id="cancel-description" variant="cancel-edit" v-if="description !== newEventDescription" @click="cancelDescription">Cancel</b-btn>
                   <b-btn id="save-description" variant="save" v-if="description !== newEventDescription" @click="saveDescription">Save</b-btn>
                 </span>
                 <b-form-textarea id="event-description" placeholder="Enter description" v-model="newEventDescription" style="cursor: pointer;" no-resize/>

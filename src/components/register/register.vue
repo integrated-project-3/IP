@@ -154,7 +154,6 @@ export default {
     },
     /*
       Deals with selection and deselction of rows.
-      There must have been an easier way to do this.
     */
     rowClicked: function(item, index, event) {
       event.stopPropagation()
