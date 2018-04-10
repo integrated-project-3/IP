@@ -7,7 +7,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
 import router from './router'
-import {getAll, createTimeline, deleteTimeline, changeTimelineTitle, createEvent, linkEventToTimeline, unlinkEventFromEvent, linkEventToEvent, deleteEvent, changeEventTitle, unlinkEventFromTimeline} from './scripts/api'
+import {getAll, createTimeline, deleteTimeline, changeTimelineTitle, createEvent, linkEventToTimeline, unlinkEventFromEvent, linkEventToEvent, deleteEvent, changeEventTitle, unlinkEventFromTimeline, changeEventDescription} from './scripts/api'
 
 Vue.use(BootstrapVue)
 Vue.use(VueRouter)
@@ -81,6 +81,17 @@ const store = new Vuex.Store({
           state.currentTimeline.timelineEvents[i].Title = payload.title
           if(payload.id === state.currentEvent.Id) {
             state.currentEvent.Title = payload.title
+          }
+          return
+        }
+      }
+    },
+    updateEventDescription(state, payload) {
+      for (var i = 0; i < state.currentTimeline.timelineEvents.length; i++) {
+        if (state.currentTimeline.timelineEvents[i].Id === payload.id) {
+          state.currentTimeline.timelineEvents[i].Description = payload.description
+          if(payload.id === state.currentEvent.Id) {
+            state.currentEvent.Description = payload.description
           }
           return
         }
@@ -217,6 +228,13 @@ const store = new Vuex.Store({
       var title = payload.title
       changeEventTitle(id, title).then(() => {
         commit('updateEventTitle', {id, title})
+      })
+    },
+    changeEventDescription({ commit }, payload) {
+      var id = payload.id
+      var description = payload.description
+      changeEventDescription(id, description).then(() => {
+        commit('updateEventDescription', {id, description})
       })
     }
   },

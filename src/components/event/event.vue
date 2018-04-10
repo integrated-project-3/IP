@@ -15,6 +15,14 @@
               <b-btn variant="delete" @click="openModal('deleteEvent')" id="event-delete-button">Delete event</b-btn>
             </b-col>
           </b-row>
+          <b-row class="event-main" align-v="center">
+            <b-col sm="12">
+              <h1>Description</h1>
+              <i class="material-icons description-controls" id="save-description" v-if="description !== newEventDescription" @click="saveDescription">done</i>
+              <i class="material-icons description-controls" id="cancel-description" v-if="description !== newEventDescription" @click="cancelDescription">close</i>
+              <b-form-textarea id="event-description" v-model="newEventDescription" style="cursor: pointer;" no-resize/>
+            </b-col>
+          </b-row>
         </b-col>
       </b-row>
     </div>
@@ -35,15 +43,27 @@
 
 <script>
 import {formatEventDate, formatEventTime} from '../../scripts/script'
+import $ from 'jquery'
 
 export default {
   name: 'aTimeline',
+  data() {
+    return {
+      newEventDescription: ''
+    }
+  },
+  mounted() {
+    this.newEventDescription = this.description
+  },
   computed: {
     timeline() {
       return this.$store.state.currentTimeline
     },
     event() {
       return this.$store.state.currentEvent
+    },
+    id() {
+      return this.event.Id
     },
     title() {
       return this.event.Title
@@ -59,14 +79,24 @@ export default {
       if (time === 'Time not available')
         return ''
       return time
+    },
+    description() {
+      return this.event.Description
     }
   },
   methods: {
     back() {
       this.$router.push({name: 'TIMELINE'})
     },
-    openModal(type) {
-      console.log(type)
+    cancelDescription() {
+      this.newEventDescription = this.description
+    },
+    saveDescription() {
+      var payload = {
+        id: this.id,
+        description: this.newEventDescription
+      }
+      this.$store.dispatch('changeEventDescription', payload)
     }
   }
 }
@@ -133,6 +163,13 @@ export default {
       }
     }
     i {font-size: 0.7em;}
+  }
+  .event-main {
+    h1 {
+      display: inline;
+    }
+    #event-description {
+    }
   }
 }
 </style>
