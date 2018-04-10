@@ -7,7 +7,7 @@
             <b-btn variant="select" @click="back" id="timeline-back-button">Back</b-btn>
           </b-col>
           <b-col sm="12" lg="6" class="timeline-details">
-            <h1>{{title}}<i v-on:click="openModal('editTimelineTitle')" class="material-icons icon">edit</i></h1>
+            <h1 v-on:click="openModal('editTimelineTitle')" style="cursor: pointer;">{{title}}</h1>
             <h3>{{date}}</h3>
           </b-col>
           <b-col sm="6" lg="2" class="timeline-buttons">
@@ -294,7 +294,6 @@ export default {
         }
       }
     }
-    i {font-size: 0.7em;}
   }
 }
 #timeline-modal {
