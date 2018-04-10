@@ -58,7 +58,10 @@ export default {
       width: 93%;
       font-size: 2em;
       padding-left: 15px;
-      &:focus {outline: none;}
+      &:focus {
+        // outline: none;
+        outline: 1px solid gray;
+      }
     }
     .header-icon {
       position: absolute;

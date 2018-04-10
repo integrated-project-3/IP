@@ -163,12 +163,12 @@ export default {
       textarea {
         border: none;
         overflow: auto;
-        outline: none;
         -webkit-box-shadow: none;
         -moz-box-shadow: none;
         box-shadow: none;
         &:focus {
           background-color: $edit-description;
+          outline: 1px solid gray;
         }
       }
     }
