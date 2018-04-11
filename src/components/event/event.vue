@@ -9,7 +9,7 @@
             </b-col>
             <b-col sm="12" lg="8" class="event-details">
               <h1 @click="openModal('editEventTitle')" style="cursor: pointer;">{{title}}</h1>
-              <h3>{{date}} - {{time}}<i class="material-icons date-range">date_range</i></h3>
+              <h3>{{date}} - {{time}}</h3>
             </b-col>
             <b-col sm="12" lg="2" class="event-buttons">
               <b-btn variant="delete" @click="openModal('deleteEvent')" id="event-delete-button">Delete event</b-btn>
