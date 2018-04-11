@@ -17,7 +17,7 @@
             <b-btn variant="create" @click="openModal('createEvent')" style="float: right;" id="timeline-create-button">Create new event</b-btn>
           </b-col>
         </b-row>
-        <b-row align-v="center" class="events">
+        <b-row align-v="center">
           <a-events ref="events" :events="events"></a-events>
         </b-row>
       </div>

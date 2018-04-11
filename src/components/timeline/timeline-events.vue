@@ -1,5 +1,5 @@
 <template lang="html">
-  <div>
+  <div class="timeline-events">
     <div class="events" id="container" @mousedown="drag($event, 'down')" @mousemove="drag($event, 'drag')" @mouseup="drag($event, 'up')">
       <div id="slider" :style="{width: sliderWidth}">
         <div class="event" v-for="(e, index) in eventsInOrder" :key="e.id">
@@ -296,132 +296,135 @@ export default {
 
 $width-large: 992px;
 
-.events {
-  overflow: hidden;
-  height: 500px;
-  cursor: pointer;
-  width: 100vw;
-  height: 500px;
-  // box-shadow: 0 0 5px 5px rgba(0, 0, 0, .1);
-  padding-top: 10px;
-  @media screen and (max-width: $width-large) {
-    height: auto;
-    width: 100%;
-    margin: auto;
-  }
-  #slider {
-    position: relative;
-    top: 0;
-    left: 0;
-    transform-origin: 0 0;
-    pointer-events: none;
+.timeline-events {
+  width: 100%;  
+  .events {
+    overflow: hidden;
+    height: 500px;
+    cursor: pointer;
+    width: 100vw;
+    height: 500px;
+    // box-shadow: 0 0 5px 5px rgba(0, 0, 0, .1);
+    padding-top: 10px;
     @media screen and (max-width: $width-large) {
-      transform: scale(1) !important;
-      width: 100% !important;
-    }
-  }
-  #h-line {
-    width: 75px;
-    border-bottom: 1px solid black;
-    position: relative;
-    top: -35px;
-    right: -300px;
-    @media screen and (max-width: $width-large) {
-      display: none;
-    }
-  }
-  .v-line {
-    height: 50px;
-    border-left: 1px solid black;
-    &#v-line-title {
-      position: relative;
-      left: 150px;
-    }
-    &#v-line-time {
-      position: absolute;
-      margin-left: 150px;
-      margin-top: -120px;
-    }
-    @media screen and (max-width: $width-large) {
-      display: none;
-    }
-  }
-  .event {
-    margin-left: 37.5px;
-    margin-right: 37.5px;
-    display: inline-block;
-    text-align: center;
-    cursor: default;
-    pointer-events: all;
-    @media screen and (max-width: $width-large) {
+      height: auto;
       width: 100%;
-      margin: 0;
-      text-align: left;
-      padding-top: 1px;
+      margin: auto;
     }
-    p {
+    #slider {
       position: relative;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0;
+      left: 0;
+      transform-origin: 0 0;
       pointer-events: none;
       @media screen and (max-width: $width-large) {
-        padding-left: 20px;
+        transform: scale(1) !important;
+        width: 100% !important;
       }
     }
-    .time {
-      background-color: $text;
-      color: white;
-      width: 200px;
-      height: 70px;
-      margin: auto;
-      transform: skewX(-10deg);
+    #h-line {
+      width: 75px;
+      border-bottom: 1px solid black;
+      position: relative;
+      top: -35px;
+      right: -300px;
       @media screen and (max-width: $width-large) {
         display: none;
-        background-color: red;
       }
     }
-    .title {
-      background-color: white;
-      margin-top: 50px;
-      position: relative;
-      top: 50%;
-      width: 300px;
-      height: 70px;
-      &.selected {
-        background-color: $select;
-        color: white;
+    .v-line {
+      height: 50px;
+      border-left: 1px solid black;
+      &#v-line-title {
+        position: relative;
+        left: 150px;
+      }
+      &#v-line-time {
+        position: absolute;
+        margin-left: 150px;
+        margin-top: -120px;
       }
       @media screen and (max-width: $width-large) {
-        width: 100%;
-        margin-top: 0;
+        display: none;
       }
     }
-  }
-  .info {
-    position: absolute;
-    pointer-events: all;
-    cursor: default;
-  }
-  .info #event-info-inner{
-    background-color: white;
-    box-shadow: 0 16px 16px rgba(0, 0, 0, .16);
-    width: 300px;
-    max-height: 200px;
-    padding: 10px;
-    h3 {
-      // overflow: hidden;
-      white-space: nowrap;
+    .event {
+      margin-left: 37.5px;
+      margin-right: 37.5px;
+      display: inline-block;
+      text-align: center;
+      cursor: default;
+      pointer-events: all;
+      @media screen and (max-width: $width-large) {
+        width: 100%;
+        margin: 0;
+        text-align: left;
+        padding-top: 1px;
+      }
+      p {
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        @media screen and (max-width: $width-large) {
+          padding-left: 20px;
+        }
+      }
+      .time {
+        background-color: $text;
+        color: white;
+        width: 200px;
+        height: 70px;
+        margin: auto;
+        transform: skewX(-10deg);
+        @media screen and (max-width: $width-large) {
+          display: none;
+          background-color: red;
+        }
+      }
+      .title {
+        background-color: white;
+        margin-top: 50px;
+        position: relative;
+        top: 50%;
+        width: 300px;
+        height: 70px;
+        &.selected {
+          background-color: $select;
+          color: white;
+        }
+        @media screen and (max-width: $width-large) {
+          width: 100%;
+          margin-top: 0;
+        }
+      }
     }
-    overflow: hidden;
-    .icon {
-      cursor: pointer;
+    .info {
+      position: absolute;
+      pointer-events: all;
+      cursor: default;
     }
+    .info #event-info-inner{
+      background-color: white;
+      box-shadow: 0 16px 16px rgba(0, 0, 0, .16);
+      width: 300px;
+      max-height: 200px;
+      padding: 10px;
+      h3 {
+        // overflow: hidden;
+        white-space: nowrap;
+      }
+      overflow: hidden;
+      .icon {
+        cursor: pointer;
+      }
 
-    @media screen and (max-width: $width-large) {
-      width: 198px;
-      padding: 0;
-      background-color: inherit;
-      box-shadow: none;
+      @media screen and (max-width: $width-large) {
+        width: 198px;
+        padding: 0;
+        background-color: inherit;
+        box-shadow: none;
+      }
     }
   }
 }

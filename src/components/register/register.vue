@@ -271,7 +271,7 @@ export default {
       this.modalType = ''
       this.modalTitle = ''
     },
-    rowHovered(item, index, event) {
+    rowHovered(item, index) {
       hoveredRow.item = item
       hoveredRow.index = index
     },
@@ -286,7 +286,7 @@ export default {
         this.clearSelected()
         selectRow(hoveredRow.item)
 
-        contextmenu.onmouseleave = function(e) {
+        contextmenu.onmouseleave = function() {
           contextmenu.style.display = "none"
         }
       }
