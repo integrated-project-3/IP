@@ -190,3 +190,31 @@ export function changeEventDescription(id, description) {
   })
   return put
 }
+
+export function createAttachment(payload) {
+  var put = axios.put('https://gcu.ideagen-development.com/TimelineEventAttachment/Create',
+    {
+    'AuthToken':'7cbc5c61-bcfa-47d8-a171-599616102147',
+    'TenantId':'Team19',
+    'AttachmentId': GUID(),
+    'Title': payload.title,
+    'TimelineEventId': payload.eventId
+    }
+  ).catch(error => {
+    console.log(error)
+  })
+  return put
+}
+
+export function deleteAttachment(id) {
+  var put = axios.put('https://gcu.ideagen-development.com/TimelineEventAttachment/Delete',
+    {
+      'AuthToken':'7cbc5c61-bcfa-47d8-a171-599616102147',
+      'TenantId':'Team19',
+      'AttachmentId':id
+    }
+  ).catch(error => {
+    console.log(error)
+  })
+  return put
+}

@@ -17,16 +17,30 @@
           </b-row>
           <b-row class="event-main" align-v="center">
             <b-col sm="12">
-              <div class="description">
-                <h1>Description</h1>
-                <span id="controls">
-                  <!-- <i class="material-icons description-controls" id="save-description" v-if="description !== newEventDescription" @click="saveDescription">done</i>
-                  <i class="material-icons description-controls" id="cancel-description" v-if="description !== newEventDescription" @click="cancelDescription">close</i> -->
-                  <b-btn id="cancel-description" variant="cancel-edit" v-if="description !== newEventDescription" @click="cancelDescription">Cancel</b-btn>
-                  <b-btn id="save-description" variant="save" v-if="description !== newEventDescription" @click="saveDescription">Save</b-btn>
-                </span>
-                <b-form-textarea id="event-description" placeholder="Enter description" v-model="newEventDescription" style="cursor: pointer;" no-resize/>
-              </div>
+              <b-row>
+                <b-col sm="12" class="description">
+                  <h1>Description</h1>
+                  <span id="controls">
+                    <b-btn id="cancel-description" variant="cancel-edit" v-if="description !== newEventDescription" @click="cancelDescription">Cancel</b-btn>
+                    <b-btn id="save-description" variant="save" v-if="description !== newEventDescription" @click="saveDescription">Save</b-btn>
+                  </span>
+                  <b-form-textarea id="event-description" placeholder="Enter description" v-model="newEventDescription" style="cursor: pointer;" no-resize/>
+                </b-col>
+              </b-row>
+              <b-row>
+                <b-col sm="12" md="6" class="attachments">
+                  <h1>Attachments</h1>
+                  <ul id="attachment-list">
+                    <li v-for="attachment in attachments" :key="attachment.Id" @click="clickedAttachment($event)">
+                      <span :id="attachment.Id">{{attachment.Title}}</span>
+                    </li>
+                  </ul>
+                  <span id="controls">
+                    <b-btn id="delete-attachment" variant="delete" @click="openModal('deleteAttachment')" :disabled="selectedAttachmentId === ''">Delete</b-btn>
+                    <b-btn id="create-attachment" variant="create" @click="openModal('createAttachment')">Create</b-btn>
+                  </span>
+                </b-col>
+              </b-row>
             </b-col>
           </b-row>
         </b-col>
@@ -39,10 +53,23 @@
               <b-alert variant="danger" :show="showTitleWarning">Title must be at least 5 characters long</b-alert>
             </b-col>
           </b-row>
+          <b-row v-else-if="modalType === 'createAttachment'">
+            <input type="text" v-model="newAttachmentTitle" @keyup.enter="createAttachment" @keyup="checkTitleInput" placeholder="Enter attachment title" id="title-input" />
+            <b-alert variant="danger" :show="showTitleWarning">Title must be at least 5 characters long</b-alert>
+          </b-row>
+          <b-row v-else-if="modalType === 'deleteAttachment'">
+            <b-col>
+              <p>
+                Are you sure you wish to delete this attachment?
+              </p>
+            </b-col>
+          </b-row>
         </b-container>
         <div slot="modal-footer" class="w-100">
           <b-btn class="float-left" @click="closeModal">CANCEL</b-btn>
           <b-btn v-if="modalType === 'editEventTitle'" class="float-right" @click="changeEventTitle">SAVE</b-btn>
+          <b-btn v-else-if="modalType === 'createAttachment'" class="float-right" @click="createAttachment">Create</b-btn>
+          <b-btn v-else-if="modalType === 'deleteAttachment'" class="float-right" @click="deleteAttachment">Delete</b-btn>
         </div>
       </b-modal>
     </div>
@@ -73,7 +100,9 @@ export default {
       modalTitle: '',
       showTitleWarning: false,
       modalType: '',
-      newEventTitle: ''
+      newEventTitle: '',
+      newAttachmentTitle: '',
+      selectedAttachmentId: ''
     }
   },
   mounted() {
@@ -106,6 +135,9 @@ export default {
     },
     description() {
       return this.event.Description
+    },
+    attachments() {
+      return this.event.Attachments
     }
   },
   methods: {
@@ -134,11 +166,19 @@ export default {
         document.getElementById('title-input').focus()
         this.modalTitle = "Edit"
         this.newEventTitle = this.title
+      } else if (this.modalType === "createAttachment") {
+        document.getElementById('title-input').focus()
+        this.modalTitle = "Create"
+      } else if (this.modalType === "deleteAttachment") {
+        this.modalTitle = "Delete"
       }
     },
     modalClosed() {
       if (this.modalType === "editEventTitle") {
         this.newEventTitle = ''
+        this.showTitleWarning = false
+      } else if (this.modalType === "createAttachment") {
+        this.newAttachmentTitle = ''
         this.showTitleWarning = false
       }
       this.modalType = ''
@@ -152,8 +192,14 @@ export default {
         This automatically hides the warning once they have entered at least 5 characters.
       */
       if (this.showTitleWarning === true) {
-        if (validTitle(this.newEventTitle)) {
-          this.showTitleWarning = false
+        if (this.modalType === "editEventTitle") {
+          if (validTitle(this.newEventTitle)) {
+            this.showTitleWarning = false
+          }
+        } else if (this.modalType === "createAttachment") {
+          if (validTitle(this.newAttachmentTitle)) {
+            this.showTitleWarning = false
+          }
         }
       }
     },
@@ -169,6 +215,36 @@ export default {
         title: this.newEventTitle
       }
       this.$store.dispatch('changeEventTitle', payload)
+    },
+    createAttachment() {
+      if (!validTitle(this.newAttachmentTitle)) {
+        document.getElementById('title-input').focus()
+        this.showTitleWarning = true
+        return
+      }
+      this.closeModal()
+      this.$store.dispatch('createAttachment', this.newAttachmentTitle)
+    },
+    clickedAttachment(event) {
+      if (event.target.classList.contains("selected")) {
+        this.clearSelected()
+        return
+      }
+      this.clearSelected()
+      event.target.classList.add("selected")
+      this.selectedAttachmentId = event.target.children[0].id
+    },
+    clearSelected() {
+      var selected = document.getElementsByClassName("selected")
+      for (var i = selected.length-1; i >= 0; i--) {
+        selected[0].classList.remove("selected")
+      }
+      this.selectedAttachmentId = ''
+    },
+    deleteAttachment() {
+      this.closeModal()
+      this.$store.dispatch('deleteAttachment', this.selectedAttachmentId)
+      this.clearSelected()
     }
   }
 }
@@ -210,22 +286,17 @@ export default {
   }
   .event-main {
     padding: 20px;
-    .description {
-      @media screen and (max-width: 500px) {
-        // text-align: center;
+    h1 {display: inline;}
+    #controls {
+      @media screen and (max-width: 500px) {width: 100%;}
+      button {
+        &:not(:last-child) {margin-right: 5px;}
+        @media screen and (max-width: 500px) {width: 49%;}
       }
-      h1 {display: inline;}
+    }
+    .description {
       #controls {
         float: right;
-        @media screen and (max-width: 500px) {
-          width: 100%;
-        }
-        button {
-          &:not(:last-child) {margin-right: 5px;}
-          @media screen and (max-width: 500px) {
-            width: 49%;
-          }
-        }
       }
       textarea {
         border: none;
@@ -236,6 +307,28 @@ export default {
         &:focus {
           background-color: $edit-description;
           outline: 1px solid gray;
+        }
+      }
+    }
+    .attachments {
+      ul {
+        list-style-type: none;
+        padding: 0;
+        width: 65%;
+        @media screen and (max-width: 768px) {
+          width: 100%;
+        }
+        max-height: 120px;
+        overflow-y: auto;
+        li {
+          span {
+            pointer-events: none;
+          }
+          &:hover {background-color: $attachment-hover;}
+          &.selected {
+            background-color: $select;
+            color: white;
+          }
         }
       }
     }
