@@ -181,7 +181,7 @@ export default {
         this.newEventDateTime = null
         this.$refs.events.clearSelected()
       } else if (this.modalType === "editTimelineTitle") {
-        this.newEventTitle = ''
+        this.newTimelineTitle = ''
         this.showTitleWarning = false
       }
       this.modalType = ''
