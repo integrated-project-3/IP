@@ -333,4 +333,27 @@ export default {
     }
   }
 }
+#contextmenu {
+  display: none;
+  position: fixed;
+  background-color: $context-background;
+  color: $text;
+  box-shadow: 2px 2px 5px rgba(0,0,0,.5);
+  z-index: 10;
+  // outline: 1px solid gray;
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    li {
+      padding: 7px 75px 7px 7px;
+      &:first-child {margin-top: 7px;}
+      &:last-child {margin-bottom: 7px;}
+      &:hover {
+        background-color: $context-hover;
+        color: white;
+      }
+    }
+  }
+}
 </style>
