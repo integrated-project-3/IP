@@ -2,7 +2,7 @@
   <div>
     <b-row class="register" align-v="center" @click="clearSelected()">
       <b-col></b-col> <!-- used to center the table -->
-      <b-col md="11">
+      <b-col md="11" @contextmenu.prevent="openContextMenu($event)">
         <b-btn class="btn-round" variant="create" @click="openModal('createTimeline')" style="float: right;">+</b-btn>
         <b-table :items="timelines"
                   bordered:false
@@ -12,12 +12,19 @@
                   @row-clicked="rowClicked"
                   @sort-changed="sortChanged"
                   @row-dblclicked="openTimeline"
+                  @row-hovered="rowHovered"
                   fixed
                   >
         </b-table>
       </b-col>
       <b-col></b-col> <!-- used to center the table -->
     </b-row>
+    <div id="contextmenu">
+      <ul>
+        <li @click="openModal('editTitle')">Edit title</li>
+        <li @click="openModal('deleteTimeline')">Delete</li>
+      </ul>
+    </div>
     <a-selection-handler :select-count="selectCount" @del="openModal('deleteTimeline')" @cancel="cancel" @edit="openModal('editTitle')"></a-selection-handler>
     <b-modal  v-model="modal" :title="modalTitle" @shown="modalOpened" @hidden="modalClosed">
       <b-container fluid>
@@ -87,6 +94,8 @@ function deselectRow(item) {
   item.selected = false,
   item._rowVariant = ''
 }
+
+var hoveredRow = {}
 
 export default {
   name: 'aRegister',
@@ -202,7 +211,11 @@ export default {
     },
     deleteTimeline: function() {
       this.closeModal()
-      this.$store.dispatch('deleteSelectedTimelines')
+      if (this.$store.getters.selectedTimelines.length > 0) {
+        this.$store.dispatch('deleteSelectedTimelines')
+      } else {
+        this.$store.dispatch('deleteTimeline', lastSelected.id)
+      }
     },
     changeTitle: function() {
       if (!validTitle(this.newTimelineTitle)) {
@@ -212,7 +225,7 @@ export default {
       }
       this.closeModal()
       var payload = {
-        id: this.$store.getters.selectedTimelines[0].id,
+        id: lastSelected.id,
         title: this.newTimelineTitle
       }
       this.$store.dispatch('changeTimelineTitle', payload)
@@ -246,7 +259,7 @@ export default {
       } else if (this.modalType === "editTitle") {
         document.getElementById('titleInput').focus()
         this.modalTitle = "Edit"
-        this.newTimelineTitle = this.$store.getters.selectedTimelines[0].title
+        this.newTimelineTitle = lastSelected.title
       }
     },
     modalClosed: function() {
@@ -257,6 +270,26 @@ export default {
       }
       this.modalType = ''
       this.modalTitle = ''
+    },
+    rowHovered(item, index, event) {
+      hoveredRow.item = item
+      hoveredRow.index = index
+    },
+    openContextMenu(event) {
+      if (event.target.localName === "td") {
+        var contextmenu = document.getElementById('contextmenu')
+
+        contextmenu.style.display = 'inherit'
+        contextmenu.style.top = event.clientY + "px"
+        contextmenu.style.left = event.clientX + "px"
+
+        this.clearSelected()
+        selectRow(hoveredRow.item)
+
+        contextmenu.onmouseleave = function(e) {
+          contextmenu.style.display = "none"
+        }
+      }
     }
   }
 }
