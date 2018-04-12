@@ -11,6 +11,20 @@ function s4() {
   .substring(1);
 }
 
+function getBase64(file) {
+  var reader = new FileReader()
+  reader.readAsDataURL(file)
+  reader.onload = function() {
+    return reader.result
+  }
+  reader.onerror = function(error) {
+    console.log("Error: " + error)
+    return error
+  }
+
+  return null
+}
+
 export function getAll() {
   var get = axios.get('https://gcu.ideagen-development.com/Timeline/GetAllTimelinesAndEvent', {
     headers: {
@@ -213,6 +227,42 @@ export function deleteAttachment(id) {
       'TenantId':'Team19',
       'AttachmentId':id
     }
+  ).catch(error => {
+    console.log(error)
+  })
+  return put
+}
+
+export function generateUploadURL(id) {
+  var get = axios.get('https://gcu.ideagen-development.com/TimelineEventAttachment/GenerateUploadPresignedUrl', {
+    headers: {
+      'TenantId': 'Team19',
+      'AuthToken': '7cbc5c61-bcfa-47d8-a171-599616102147',
+      'AttachmentId': id
+    }
+  }).catch(error => {
+    console.log(error)
+  })
+  return get
+}
+
+export function generateGetURL(id) {
+  var get = axios.get('https://gcu.ideagen-development.com/TimelineEventAttachment/GenerateGetPresignedUrl', {
+    headers: {
+      'TenantId': 'Team19',
+      'AuthToken': '7cbc5c61-bcfa-47d8-a171-599616102147',
+      'AttachmentId': id
+    }
+  }).catch(error => {
+    console.log(error)
+  })
+  return get
+}
+
+export function uploadAttachment(payload) {
+  var url = payload.url
+  var file = payload.file
+  var put = axios.put(url, getBase64(file)
   ).catch(error => {
     console.log(error)
   })

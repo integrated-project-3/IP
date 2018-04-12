@@ -7,7 +7,12 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
 import router from './router'
-import {getAll, createTimeline, deleteTimeline, changeTimelineTitle, createEvent, linkEventToTimeline, unlinkEventFromEvent, linkEventToEvent, deleteEvent, changeEventTitle, unlinkEventFromTimeline, changeEventDescription, createAttachment, deleteAttachment} from './scripts/api'
+import {getAll,
+  createTimeline, deleteTimeline, changeTimelineTitle,
+  createEvent, linkEventToTimeline, unlinkEventFromEvent, linkEventToEvent, deleteEvent, changeEventTitle, unlinkEventFromTimeline, changeEventDescription,
+  createAttachment, deleteAttachment,
+  generateUploadURL, uploadAttachment
+} from './scripts/api'
 
 Vue.use(BootstrapVue)
 Vue.use(VueRouter)
@@ -248,12 +253,15 @@ const store = new Vuex.Store({
         commit('updateEventDescription', {id, description})
       })
     },
-    createAttachment({state, commit}, title) {
-      var payload = {}
-      payload.title = title
-      payload.eventId = state.currentEvent.Id
-      createAttachment(payload).then(response => {
-        commit('addAttachment', response.data)
+    createAttachment({state, commit}, payload) {
+      var newAttachment = {}
+      createAttachment({title: payload.name, eventId: state.currentEvent.Id}).then(response => {
+        newAttachment = response.data
+        generateUploadURL(newAttachment.Id).then(response => {
+          uploadAttachment({file: payload, url: response.data}).then(response => {
+            commit('addAttachment', newAttachment)
+          })
+        })
       })
     },
     deleteAttachment({commit}, id) {

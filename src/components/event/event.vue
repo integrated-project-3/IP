@@ -54,8 +54,7 @@
             </b-col>
           </b-row>
           <b-row v-else-if="modalType === 'createAttachment'">
-            <input type="text" v-model="newAttachmentTitle" @keyup.enter="createAttachment" @keyup="checkTitleInput" placeholder="Enter attachment title" id="title-input" />
-            <b-alert variant="danger" :show="showTitleWarning">Title must be at least 5 characters long</b-alert>
+            <input type="file" id="newAttachmentInput"/>
           </b-row>
           <b-row v-else-if="modalType === 'deleteAttachment'">
             <b-col>
@@ -101,7 +100,6 @@ export default {
       showTitleWarning: false,
       modalType: '',
       newEventTitle: '',
-      newAttachmentTitle: '',
       selectedAttachmentId: ''
     }
   },
@@ -167,7 +165,6 @@ export default {
         this.modalTitle = "Edit"
         this.newEventTitle = this.title
       } else if (this.modalType === "createAttachment") {
-        document.getElementById('title-input').focus()
         this.modalTitle = "Create"
       } else if (this.modalType === "deleteAttachment") {
         this.modalTitle = "Delete"
@@ -176,9 +173,6 @@ export default {
     modalClosed() {
       if (this.modalType === "editEventTitle") {
         this.newEventTitle = ''
-        this.showTitleWarning = false
-      } else if (this.modalType === "createAttachment") {
-        this.newAttachmentTitle = ''
         this.showTitleWarning = false
       }
       this.modalType = ''
@@ -217,13 +211,11 @@ export default {
       this.$store.dispatch('changeEventTitle', payload)
     },
     createAttachment() {
-      if (!validTitle(this.newAttachmentTitle)) {
-        document.getElementById('title-input').focus()
-        this.showTitleWarning = true
-        return
-      }
+      var fileInput = document.getElementById('newAttachmentInput')
+      var file = fileInput.files[0]
+      if (file === '') return
       this.closeModal()
-      this.$store.dispatch('createAttachment', this.newAttachmentTitle)
+      this.$store.dispatch('createAttachment', file)
     },
     clickedAttachment(event) {
       if (event.target.classList.contains("selected")) {
