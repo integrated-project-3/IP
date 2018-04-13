@@ -11,18 +11,23 @@ function s4() {
   .substring(1);
 }
 
-function getBase64(file) {
+function getBase64(callback, file) {
   var reader = new FileReader()
   reader.readAsDataURL(file)
   reader.onload = function() {
-    return reader.result
+    callback(reader.result)
   }
   reader.onerror = function(error) {
-    console.log("Error: " + error)
-    return error
+    console.log(error)
   }
+}
 
-  return null
+function urlToFile(url, filename, mimeType) {
+  mimeType = mimeType || (url.match(/^data:([^;]+);/)||'')[1]
+    return (fetch(url)
+        .then(function(res){return res.arrayBuffer()})
+        .then(function(buf){return new File([buf], filename, {type:mimeType})})
+    );
 }
 
 export function getAll() {
@@ -260,11 +265,34 @@ export function generateGetURL(id) {
 }
 
 export function uploadAttachment(payload) {
-  var url = payload.url
-  var file = payload.file
-  var put = axios.put(url, getBase64(file)
-  ).catch(error => {
-    console.log(error)
+  var fileBase64 = ''
+  return new Promise(function(resolve, reject) {
+    getBase64(function(val) {
+      fileBase64 = val
+      axios.put(payload.url, fileBase64
+      ).then(result => {
+        resolve(result)
+      })
+      .catch(error => {
+        console.log(error)
+        reject(error)
+      })
+    }, payload.file)
   })
-  return put
+}
+
+export function downloadAttachment(filename, url) {
+  return new Promise(function(resolve, reject) {
+    axios.get(url)
+    .then(response => {
+      var base64 = response.data
+      urlToFile(base64,filename).then(function(file) {
+        resolve(file)
+      })
+    })
+    .catch(error => {
+      console.log(error)
+      reject(error)
+    })
+  })
 }

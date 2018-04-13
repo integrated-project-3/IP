@@ -11,8 +11,9 @@ import {getAll,
   createTimeline, deleteTimeline, changeTimelineTitle,
   createEvent, linkEventToTimeline, unlinkEventFromEvent, linkEventToEvent, deleteEvent, changeEventTitle, unlinkEventFromTimeline, changeEventDescription,
   createAttachment, deleteAttachment,
-  generateUploadURL, uploadAttachment
+  generateUploadURL, generateGetURL, uploadAttachment, downloadAttachment
 } from './scripts/api'
+import FileSaver from 'file-saver'
 
 Vue.use(BootstrapVue)
 Vue.use(VueRouter)
@@ -258,7 +259,7 @@ const store = new Vuex.Store({
       createAttachment({title: payload.name, eventId: state.currentEvent.Id}).then(response => {
         newAttachment = response.data
         generateUploadURL(newAttachment.Id).then(response => {
-          uploadAttachment({file: payload, url: response.data}).then(response => {
+          uploadAttachment({file: payload, url: response.data}).then(() => {
             commit('addAttachment', newAttachment)
           })
         })
@@ -267,6 +268,15 @@ const store = new Vuex.Store({
     deleteAttachment({commit}, id) {
       deleteAttachment(id).then(() => {
         commit('removeAttachment', id)
+      })
+    },
+    getAttachment({state}, id) {
+      generateGetURL(id).then(response => {
+        var url = response.data
+        var filename = state.currentEvent.Attachments.filter(attachment => attachment.Id === id)[0].Title
+        downloadAttachment(filename, url).then(response => {
+          FileSaver.saveAs(response)
+        })
       })
     }
   },

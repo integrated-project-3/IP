@@ -31,7 +31,7 @@
                 <b-col sm="12" md="6" class="attachments">
                   <h1>Attachments</h1>
                   <ul id="attachment-list">
-                    <li v-for="attachment in attachments" :key="attachment.Id" @click="clickedAttachment($event)">
+                    <li v-for="attachment in attachments" :key="attachment.Id" @click="clickedAttachment($event)" @contextmenu.prevent="clickedAttachment($event)">
                       <span :id="attachment.Id">{{attachment.Title}}</span>
                     </li>
                   </ul>
@@ -45,6 +45,12 @@
           </b-row>
         </b-col>
       </b-row>
+      <div id="contextmenu">
+        <ul>
+          <li @click="openAttachment">Open</li>
+          <li @click="openModal('deleteAttachment')">Delete</li>
+        </ul>
+      </div>
       <b-modal  v-model="modal" :title="modalTitle" @shown="modalOpened" @hidden="modalClosed" size="lg" id="timeline-modal">
         <b-container fluid>
           <b-row v-if="modalType === 'editEventTitle'">
@@ -218,13 +224,25 @@ export default {
       this.$store.dispatch('createAttachment', file)
     },
     clickedAttachment(event) {
-      if (event.target.classList.contains("selected")) {
+      if (event.target.classList.contains("selected") && event.button !== 2) {
         this.clearSelected()
         return
       }
       this.clearSelected()
       event.target.classList.add("selected")
       this.selectedAttachmentId = event.target.children[0].id
+
+      if(event.button === 2) {
+        var contextmenu = document.getElementById('contextmenu')
+
+        contextmenu.style.display = 'inherit'
+        contextmenu.style.top = event.clientY + "px"
+        contextmenu.style.left = event.clientX + "px"
+
+        contextmenu.onmouseleave = function() {
+          contextmenu.style.display = "none"
+        }
+      }
     },
     clearSelected() {
       var selected = document.getElementsByClassName("selected")
@@ -237,6 +255,9 @@ export default {
       this.closeModal()
       this.$store.dispatch('deleteAttachment', this.selectedAttachmentId)
       this.clearSelected()
+    },
+    openAttachment() {
+      this.$store.dispatch('getAttachment', this.selectedAttachmentId)
     }
   }
 }
