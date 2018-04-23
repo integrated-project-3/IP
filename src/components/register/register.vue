@@ -14,6 +14,7 @@
                   @row-dblclicked="openTimeline"
                   @row-hovered="rowHovered"
                   fixed
+                  :filter="searchValue"
                   >
         </b-table>
       </b-col>
@@ -126,6 +127,9 @@ export default {
     },
     selectCount() {
       return this.$store.getters.selectedTimelines.length
+    },
+    searchValue() {
+      return this.$store.state.searchValue
     }
   },
   methods: {

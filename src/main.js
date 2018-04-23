@@ -27,9 +27,13 @@ const store = new Vuex.Store({
   state: {
     timelines,
     currentTimeline: null,
-    currentEvent: null
+    currentEvent: null,
+    searchValue: ''
   },
   mutations: {
+    search(state, value) {
+      state.searchValue = value
+    },
     addTimeline (state, timeline) {
       state.timelines.push(timeline)
     },

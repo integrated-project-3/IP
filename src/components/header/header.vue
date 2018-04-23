@@ -27,7 +27,7 @@ export default {
       event.stopPropagation()
     },
     search: function() {
-      console.log(this.searchValue)
+      this.$store.commit("search", this.searchValue)
     }
   }
 }
